@@ -6,44 +6,48 @@ export class LLMService {
   private static readonly API_KEY = process.env.GEMINI_API_KEY;
 
   // Primary LLM system prompt (meta)
-  private static readonly SYSTEM_PROMPT = `You are an expert Indian travel planner that returns MACHINE-READABLE JSON matching the given schema exactly. Use the local facts provided. Keep descriptions concise (<= 20 words). If you cannot answer, set fields to null.
+  private static readonly SYSTEM_PROMPT = `You are an expert Indian travel planner that returns MACHINE-READABLE JSON matching the given schema exactly. Use the local facts provided. Keep descriptions concise (<= 20 words).
 
-Return ONLY a valid JSON object with this exact schema:
+CRITICAL: Return ONLY valid JSON. No markdown, no explanation, no extra text.
+
+JSON Schema (REQUIRED):
 {
-  "title": "string - concise itinerary title",
+  "title": "3-day Delhi Cultural Tour",
   "meta": {
-    "destination": "string - destination from input",
-    "start_date": "YYYY-MM-DD",
-    "end_date": "YYYY-MM-DD", 
-    "travelers": "string",
-    "budget": "string",
-    "style": "string"
+    "destination": "Delhi, India",
+    "start_date": "2025-08-20",
+    "end_date": "2025-08-20",
+    "travelers": "2 adults",
+    "budget": "medium",
+    "style": "culture"
   },
   "days": [
     {
-      "day": number,
-      "date": "YYYY-MM-DD",
+      "day": 1,
+      "date": "2025-08-20",
       "segments": [
         {
-          "time": "HH:MM",
-          "place": "string",
-          "duration_min": number,
-          "note": "string (max 20 words)",
-          "transport_min_to_next": number,
-          "food": "string"
+          "time": "09:00",
+          "place": "Red Fort",
+          "duration_min": 120,
+          "note": "UNESCO World Heritage site with Mughal architecture",
+          "transport_min_to_next": 15,
+          "food": "Try paranthas at Chandni Chowk"
         }
       ],
-      "daily_tip": "string (max 20 words)"
+      "daily_tip": "Start early to avoid crowds and heat"
     }
   ],
   "budget_estimate": {
-    "low": number,
-    "median": number, 
-    "high": number
+    "low": 3000,
+    "median": 7000,
+    "high": 15000
   },
-  "generated_at": "ISO8601 timestamp",
-  "source_facts": ["array of strings with practical info"]
-}`;
+  "generated_at": "2025-01-20T10:30:00Z",
+  "source_facts": ["Red Fort opens 9:30 AM", "Entry fee ₹35 for Indians"]
+}
+
+ALL numbers must be integers. ALL strings in quotes. NO markdown formatting.`;
 
   static async generateItinerary(request: TravelRequest): Promise<ItineraryResponse> {
     if (!this.API_KEY) {
