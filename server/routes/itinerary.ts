@@ -1,14 +1,15 @@
 import { RequestHandler } from 'express';
 import { randomUUID } from 'crypto';
-import { 
-  TravelRequest, 
-  GenerateItineraryResponse, 
+import {
+  TravelRequest,
+  GenerateItineraryResponse,
   GetItineraryResponse,
   ExportResponse,
   SaveEmailResponse
 } from '@shared/api';
 import { LLMService } from '../services/llm';
 import { CacheService } from '../services/cache';
+import { ValidationService } from '../services/validation';
 
 // In-memory storage for development - in production, use PostgreSQL/Supabase
 const itineraries = new Map();
@@ -16,19 +17,29 @@ const users = new Map();
 
 export const generateItinerary: RequestHandler = async (req, res) => {
   try {
-    const request: TravelRequest = req.body;
+    // Sanitize and validate input
+    const sanitizedRequest = ValidationService.sanitizeRequest(req.body);
+    const validation = ValidationService.validateTravelRequest(sanitizedRequest);
 
-    // Validate required fields
-    if (!request.destination || !request.startDate || !request.endDate || 
-        !request.travelers || !request.budget || !request.style) {
+    if (!validation.valid) {
       return res.status(400).json({
         success: false,
-        error: 'Missing required fields: destination, startDate, endDate, travelers, budget, style'
+        error: `Validation failed: ${validation.errors.join(', ')}`
       });
     }
 
-    // Get user IP for rate limiting
-    const userIdOrIP = request.userId || req.ip || 'anonymous';
+    // Check if destination is supported
+    if (!ValidationService.isSupportedDestination(sanitizedRequest.destination)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Currently we only support destinations within India. Please choose an Indian city or state.'
+      });
+    }
+
+    const request: TravelRequest = sanitizedRequest;
+
+    // Get user identifier for rate limiting
+    const userIdOrIP = ValidationService.getUserIdentifier(req);
     
     // Check rate limits
     const rateCheck = CacheService.checkRateLimit(userIdOrIP, !!request.userId);
