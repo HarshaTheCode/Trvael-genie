@@ -18,7 +18,10 @@ export default function Index() {
     budget: 'medium',
     style: 'culture',
     language: 'en',
-    origin: ''
+    origin: '',
+    customRequirements: '',
+    accessibility: '',
+    travelPace: 'moderate'
   });
   
   const [isLoading, setIsLoading] = useState(false);
@@ -360,10 +363,16 @@ export default function Index() {
                         <SelectValue placeholder="Select travel style" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="culture">Cultural & Heritage</SelectItem>
-                        <SelectItem value="adventure">Adventure & Nature</SelectItem>
-                        <SelectItem value="food">Food & Culinary</SelectItem>
-                        <SelectItem value="relax">Relaxation & Wellness</SelectItem>
+                        <SelectItem value="culture">🏛️ Cultural & Heritage</SelectItem>
+                        <SelectItem value="adventure">🏔️ Adventure & Nature</SelectItem>
+                        <SelectItem value="food">🍽️ Food & Culinary</SelectItem>
+                        <SelectItem value="relax">🧘 Relaxation & Wellness</SelectItem>
+                        <SelectItem value="spiritual">🕉️ Spiritual & Religious</SelectItem>
+                        <SelectItem value="photography">📸 Photography & Sightseeing</SelectItem>
+                        <SelectItem value="shopping">🛍️ Shopping & Markets</SelectItem>
+                        <SelectItem value="wildlife">🐅 Wildlife & Safari</SelectItem>
+                        <SelectItem value="wellness">💆 Wellness & Spa</SelectItem>
+                        <SelectItem value="nightlife">🌃 Nightlife & Entertainment</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -379,6 +388,46 @@ export default function Index() {
                         <SelectItem value="hi">Hindi</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="travelPace">Travel Pace</Label>
+                    <Select value={formData.travelPace} onValueChange={(value: any) => handleInputChange('travelPace', value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select travel pace" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="slow">🐢 Slow & Relaxed (2-3 places/day)</SelectItem>
+                        <SelectItem value="moderate">🚶 Moderate (4-5 places/day)</SelectItem>
+                        <SelectItem value="fast">🏃 Fast-Paced (6+ places/day)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="customRequirements">Special Requests & Preferences (Optional)</Label>
+                    <Textarea
+                      id="customRequirements"
+                      placeholder="e.g., Want to visit specific temples, prefer vegetarian restaurants, need wheelchair accessibility, interested in local festivals, want photography workshops..."
+                      value={formData.customRequirements}
+                      onChange={(e) => handleInputChange('customRequirements', e.target.value)}
+                      className="min-h-[100px]"
+                    />
+                    <p className="text-sm text-gray-500">
+                      Tell us about any specific interests, requirements, or experiences you're looking for
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="accessibility">Accessibility Needs (Optional)</Label>
+                    <Input
+                      id="accessibility"
+                      placeholder="e.g., wheelchair access, mobility assistance, hearing/visual aids"
+                      value={formData.accessibility}
+                      onChange={(e) => handleInputChange('accessibility', e.target.value)}
+                    />
                   </div>
                 </div>
 
