@@ -10,7 +10,7 @@ export class CacheService {
   private static readonly RATE_RESET_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours
 
   static generateCacheKey(request: TravelRequest): string {
-    // Normalize the request for consistent caching
+    // Use LLM service normalization for consistency
     const normalized = {
       destination: request.destination.toLowerCase().trim(),
       startDate: request.startDate,
@@ -18,10 +18,18 @@ export class CacheService {
       travelers: request.travelers.toLowerCase().trim(),
       budget: request.budget,
       style: request.style,
-      origin: request.origin?.toLowerCase().trim() || ''
+      origin: request.origin?.toLowerCase().trim() || '',
+      language: request.language || 'en'
     };
 
-    const str = JSON.stringify(normalized);
+    // Sort keys for consistent hashing
+    const sortedKeys = Object.keys(normalized).sort();
+    const sortedObj: any = {};
+    sortedKeys.forEach(key => {
+      sortedObj[key] = normalized[key as keyof typeof normalized];
+    });
+
+    const str = JSON.stringify(sortedObj);
     return crypto.createHash('md5').update(str).digest('hex');
   }
 
