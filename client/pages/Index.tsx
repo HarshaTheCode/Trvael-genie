@@ -34,6 +34,20 @@ export default function Index() {
     setIsLoading(true);
     setError(null);
 
+    // Client-side validation for date range
+    if (formData.startDate && formData.endDate) {
+      const startDate = new Date(formData.startDate);
+      const endDate = new Date(formData.endDate);
+      const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+      const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+
+      if (diffDays > 14) {
+        setError('Trip duration cannot exceed 14 days. Please split longer trips into smaller chunks.');
+        setIsLoading(false);
+        return;
+      }
+    }
+
     try {
       const response = await fetch('/api/generate-itinerary', {
         method: 'POST',
