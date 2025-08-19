@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, Calendar, Users, DollarSign, Compass, Loader2 } from 'lucide-react';
 import { TravelRequest, GenerateItineraryResponse } from '@shared/api';
+import { DestinationSuggestions } from '@/components/DestinationSuggestions';
 
 export default function Index() {
   const [formData, setFormData] = useState<TravelRequest>({
@@ -291,6 +292,9 @@ export default function Index() {
                     <p className="text-xs text-gray-500">
                       💡 Try: Full names (Hyderabad) or shortcuts (hyd, blr, del, mum)
                     </p>
+                    <DestinationSuggestions
+                      onSelect={(destination) => handleInputChange('destination', destination)}
+                    />
                   </div>
 
                   <div className="space-y-2">
@@ -373,7 +377,7 @@ export default function Index() {
                         <SelectItem value="spiritual">🕉️ Spiritual & Religious</SelectItem>
                         <SelectItem value="photography">📸 Photography & Sightseeing</SelectItem>
                         <SelectItem value="shopping">🛍️ Shopping & Markets</SelectItem>
-                        <SelectItem value="wildlife">��� Wildlife & Safari</SelectItem>
+                        <SelectItem value="wildlife">🐅 Wildlife & Safari</SelectItem>
                         <SelectItem value="wellness">💆 Wellness & Spa</SelectItem>
                         <SelectItem value="nightlife">🌃 Nightlife & Entertainment</SelectItem>
                       </SelectContent>
