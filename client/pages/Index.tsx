@@ -41,6 +41,14 @@ export default function Index() {
         body: JSON.stringify(formData)
       });
 
+      if (!response.ok) {
+        // Try to get the error message from the response
+        const errorResult = await response.json().catch(() => null);
+        const errorMessage = errorResult?.error || `Server error (${response.status})`;
+        setError(errorMessage);
+        return;
+      }
+
       const result: GenerateItineraryResponse = await response.json();
 
       if (result.success && result.itinerary) {
@@ -49,7 +57,8 @@ export default function Index() {
         setError(result.error || 'Failed to generate itinerary');
       }
     } catch (err) {
-      setError('Network error. Please try again.');
+      console.error('Request failed:', err);
+      setError('Network error. Please check your connection and try again.');
     } finally {
       setIsLoading(false);
     }
