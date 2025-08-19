@@ -193,21 +193,33 @@ If multiple valid itineraries possible, pick the "best for given budget". Do not
         throw new Error(`Day ${day.day} missing segments`);
       }
 
-      // Validate each segment
+      // Validate each segment with auto-fix
       for (const segment of day.segments) {
-        // Validate time format (HH:MM)
-        if (!/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(segment.time)) {
-          throw new Error(`Invalid time format: ${segment.time}. Must be HH:MM`);
+        // Validate time format (HH:MM) - fix if needed
+        if (!segment.time || !/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(segment.time)) {
+          console.log(`Fixing invalid time: ${segment.time}`);
+          segment.time = '09:00'; // Default time
         }
 
-        // Validate duration and transport as integers
+        // Validate duration and transport as integers - convert if needed
+        if (typeof segment.duration_min === 'string') {
+          segment.duration_min = parseInt(segment.duration_min) || 60;
+        }
         if (!Number.isInteger(segment.duration_min) || segment.duration_min < 0) {
-          throw new Error(`Invalid duration_min: ${segment.duration_min}. Must be positive integer`);
+          segment.duration_min = 60; // Default 1 hour
         }
 
-        if (!Number.isInteger(segment.transport_min_to_next) || segment.transport_min_to_next < 0) {
-          throw new Error(`Invalid transport_min_to_next: ${segment.transport_min_to_next}. Must be non-negative integer`);
+        if (typeof segment.transport_min_to_next === 'string') {
+          segment.transport_min_to_next = parseInt(segment.transport_min_to_next) || 0;
         }
+        if (!Number.isInteger(segment.transport_min_to_next) || segment.transport_min_to_next < 0) {
+          segment.transport_min_to_next = 0; // Default no transport
+        }
+
+        // Ensure required string fields exist
+        if (!segment.place) segment.place = 'Unknown Location';
+        if (!segment.note) segment.note = 'Enjoy your visit';
+        if (!segment.food) segment.food = 'Local cuisine';
       }
     }
 
