@@ -67,14 +67,10 @@ export class ValidationService {
 
       // Check trip duration (cost reduction strategy)
       const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
+      const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24))); // Same day = 1 day
+
       if (diffDays > 14) {
         errors.push('Trip duration cannot exceed 14 days. Please split longer trips into smaller chunks.');
-      }
-
-      if (diffDays < 1) {
-        errors.push('Trip duration must be at least 1 day');
       }
     }
 
