@@ -58,7 +58,7 @@ export class CacheService {
 
     // Reset credits if 24 hours have passed
     if (!rateLimit || (now - rateLimit.lastReset) > this.RATE_RESET_INTERVAL) {
-      const maxCredits = isRegistered ? 10 : 3; // 10 for registered users, 3 for anonymous
+      const maxCredits = isRegistered ? 50 : 20; // Increased limits for development
       rateLimit = {
         credits: maxCredits,
         lastReset: now
