@@ -68,12 +68,27 @@ ALL numbers must be integers. ALL strings in quotes. NO markdown formatting.`;
 ${destinationSnippet}
 
 TASK:
-Given this input:
-${JSON.stringify(request)}
+Create a detailed itinerary for: ${request.destination}
+Travel Style: ${request.style}
+Duration: ${request.startDate} to ${request.endDate}
+Travelers: ${request.travelers}
+Budget: ${request.budget}
+Travel Pace: ${request.travelPace || 'moderate'}
+${request.customRequirements ? `Special Requirements: ${request.customRequirements}` : ''}
+${request.accessibility ? `Accessibility Needs: ${request.accessibility}` : ''}
 
-Generate EXACTLY ONE JSON object matching the provided itinerary schema. Use the destination facts above when relevant. Include budget_estimate in INR rounded to nearest 100. Provide generated_at as ISO8601. Keep sentences concise (under 20 words).
+Generate EXACTLY ONE JSON object matching the provided itinerary schema.
 
-If multiple valid itineraries possible, pick the "best for given budget". Do not include additional commentary outside the JSON.`;
+IMPORTANT REQUIREMENTS:
+- Use the EXACT destination "${request.destination}" in all references
+- Focus heavily on ${request.style} experiences and activities
+- Include specific local attractions mentioned in the context above
+- Match the ${request.travelPace || 'moderate'} pace (slow=2-3 places/day, moderate=4-5, fast=6+)
+- Budget estimates in INR rounded to nearest 100
+- Keep descriptions under 20 words
+${request.customRequirements ? `- Address these special requests: ${request.customRequirements}` : ''}
+
+Do not include commentary outside the JSON.`;
 
     let attempts = 0;
     const maxAttempts = 2;

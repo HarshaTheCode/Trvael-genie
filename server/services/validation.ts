@@ -28,8 +28,8 @@ export class ValidationService {
       errors.push('Valid budget selection is required (low, medium, high)');
     }
 
-    if (!request.style || !['culture', 'adventure', 'food', 'relax'].includes(request.style)) {
-      errors.push('Valid travel style is required (culture, adventure, food, relax)');
+    if (!request.style || !['culture', 'adventure', 'food', 'relax', 'spiritual', 'photography', 'shopping', 'wildlife', 'wellness', 'nightlife'].includes(request.style)) {
+      errors.push('Valid travel style is required');
     }
 
     // Date validation
