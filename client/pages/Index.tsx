@@ -283,11 +283,14 @@ export default function Index() {
                     </Label>
                     <Input
                       id="destination"
-                      placeholder="e.g., Jaipur, Rajasthan"
+                      placeholder="e.g., Hyderabad, Jaipur, Mumbai, hyd, blr, del..."
                       value={formData.destination}
                       onChange={(e) => handleInputChange('destination', e.target.value)}
                       required
                     />
+                    <p className="text-xs text-gray-500">
+                      💡 Try: Full names (Hyderabad) or shortcuts (hyd, blr, del, mum)
+                    </p>
                   </div>
 
                   <div className="space-y-2">
@@ -370,7 +373,7 @@ export default function Index() {
                         <SelectItem value="spiritual">🕉️ Spiritual & Religious</SelectItem>
                         <SelectItem value="photography">📸 Photography & Sightseeing</SelectItem>
                         <SelectItem value="shopping">🛍️ Shopping & Markets</SelectItem>
-                        <SelectItem value="wildlife">🐅 Wildlife & Safari</SelectItem>
+                        <SelectItem value="wildlife">��� Wildlife & Safari</SelectItem>
                         <SelectItem value="wellness">💆 Wellness & Spa</SelectItem>
                         <SelectItem value="nightlife">🌃 Nightlife & Entertainment</SelectItem>
                       </SelectContent>
