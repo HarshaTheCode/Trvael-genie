@@ -76,6 +76,69 @@ const destinationsData: Destination[] = [
 ];
 
 export class DestinationService {
+  // Common abbreviations and aliases for Indian cities
+  private static readonly CITY_ALIASES: Record<string, string> = {
+    'hyd': 'hyderabad',
+    'blr': 'bengaluru',
+    'bangalore': 'bengaluru',
+    'calcutta': 'kolkata',
+    'bombay': 'mumbai',
+    'madras': 'chennai',
+    'pune': 'pune',
+    'del': 'delhi',
+    'ncr': 'delhi',
+    'new delhi': 'delhi',
+    'gurgaon': 'delhi',
+    'noida': 'delhi',
+    'cochin': 'kochi',
+    'trivandrum': 'kochi',
+    'thiruvananthapuram': 'kochi',
+    'mysuru': 'mysore',
+    'udupi': 'mysore',
+    'shimoga': 'mysore',
+    'kodaikanal': 'ooty',
+    'munnar': 'ooty',
+    'darjeeling': 'shimla',
+    'manali': 'shimla',
+    'dehradun': 'rishikesh',
+    'haridwar': 'rishikesh',
+    'pushkar': 'jaipur',
+    'jodhpur': 'jaipur',
+    'bikaner': 'jaipur',
+    'mount abu': 'udaipur',
+    'chittorgarh': 'udaipur',
+    'panaji': 'goa',
+    'margao': 'goa',
+    'calangute': 'goa',
+    'anjuna': 'goa',
+    'vasco': 'goa',
+    'hampi': 'mysore',
+    'coorg': 'mysore',
+    'mahabalipuram': 'chennai',
+    'pondicherry': 'chennai',
+    'kanyakumari': 'madurai',
+    'rameswaram': 'madurai',
+    'tirupati': 'chennai',
+    'vijayawada': 'hyderabad',
+    'visakhapatnam': 'hyderabad',
+    'vizag': 'hyderabad',
+    'aurangabad': 'mumbai',
+    'nashik': 'pune',
+    'lonavala': 'pune',
+    'mahabaleshwar': 'pune',
+    'chandigarh': 'delhi',
+    'ludhiana': 'amritsar',
+    'jalandhar': 'amritsar',
+    'pathankot': 'amritsar',
+    'srinagar': 'leh',
+    'jammu': 'leh',
+    'manali': 'shimla',
+    'kasol': 'shimla',
+    'spiti': 'leh',
+    'dharamshala': 'shimla',
+    'mcleodganj': 'shimla'
+  };
+
   /**
    * Get destination snippet for LLM context (max 150-300 tokens)
    * Returns concise information for RAG
@@ -83,25 +146,30 @@ export class DestinationService {
   static getDestinationSnippet(destinationQuery: string): string {
     // Normalize the destination query
     const normalizedQuery = destinationQuery.toLowerCase().trim();
-    
+
+    // Check for aliases first
+    const aliasMatch = this.CITY_ALIASES[normalizedQuery];
+    const searchQuery = aliasMatch || normalizedQuery;
+
     // Try to find matching destination
     let matchedDestination: Destination | null = null;
-    
+
     // First try exact city match
     for (const dest of destinationsData) {
-      if (dest.city.toLowerCase() === normalizedQuery || 
-          normalizedQuery.includes(dest.city.toLowerCase())) {
+      if (dest.city.toLowerCase() === searchQuery ||
+          dest.city.toLowerCase().includes(searchQuery) ||
+          searchQuery.includes(dest.city.toLowerCase())) {
         matchedDestination = dest;
         break;
       }
     }
-    
+
     // If no exact match, try state or partial match
     if (!matchedDestination) {
       for (const dest of destinationsData) {
-        if (dest.state.toLowerCase() === normalizedQuery ||
-            normalizedQuery.includes(dest.state.toLowerCase()) ||
-            dest.slug.toLowerCase().includes(normalizedQuery.replace(/[^a-z0-9]/g, ''))) {
+        if (dest.state.toLowerCase().includes(searchQuery) ||
+            searchQuery.includes(dest.state.toLowerCase()) ||
+            dest.slug.toLowerCase().includes(searchQuery.replace(/[^a-z0-9]/g, ''))) {
           matchedDestination = dest;
           break;
         }
