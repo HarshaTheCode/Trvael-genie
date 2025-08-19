@@ -65,17 +65,19 @@ export const generateItinerary: RequestHandler = async (req, res) => {
 
     // Generate new itinerary via LLM
     try {
-      const itinerary = await LLMService.generateItinerary(request);
-      
+      // Normalize input for consistent processing
+      const normalizedRequest = LLMService.normalizeInput(request);
+      const itinerary = await LLMService.generateItinerary(normalizedRequest);
+
       // Cache the result
       CacheService.setCachedItinerary(cacheKey, itinerary);
-      
+
       // Store in database
       const itineraryId = randomUUID();
       itineraries.set(itineraryId, {
         id: itineraryId,
         user_id: request.userId,
-        input_payload: request,
+        input_payload: normalizedRequest,
         output_json: itinerary,
         cached_key: cacheKey,
         created_at: new Date().toISOString()
@@ -86,10 +88,26 @@ export const generateItinerary: RequestHandler = async (req, res) => {
         itinerary: itinerary,
         itineraryId: itineraryId
       };
-      
+
       res.json(response);
     } catch (error) {
       console.error('LLM generation failed:', error);
+
+      // Handle specific error types
+      if (error instanceof Error) {
+        if (error.message === 'LLM_INVALID_JSON') {
+          return res.status(502).json({
+            success: false,
+            error: 'LLM_INVALID_JSON'
+          });
+        } else if (error.message.startsWith('DATE_RANGE_TOO_LONG')) {
+          return res.status(400).json({
+            success: false,
+            error: 'DATE_RANGE_TOO_LONG: Please split trips longer than 10 days into smaller chunks'
+          });
+        }
+      }
+
       res.status(502).json({
         success: false,
         error: 'LLM_TIMEOUT'
