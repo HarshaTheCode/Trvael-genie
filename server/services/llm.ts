@@ -137,23 +137,31 @@ If multiple valid itineraries possible, pick the "best for given budget". Do not
   private static async parseAndValidateResponse(response: string, request: TravelRequest): Promise<ItineraryResponse> {
     let itinerary: ItineraryResponse;
 
+    // Log the raw response for debugging
+    console.log('Gemini API raw response:', response.substring(0, 500));
+
     try {
       // First attempt: direct JSON parse
       itinerary = JSON.parse(response);
     } catch (parseError) {
+      console.log('Direct JSON parse failed, trying regex extraction');
       try {
         // Second attempt: extract JSON with regex
         const jsonMatch = response.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
+          console.log('Extracted JSON:', jsonMatch[0].substring(0, 300));
           itinerary = JSON.parse(jsonMatch[0]);
         } else {
-          throw new Error('No JSON object found in response');
+          console.log('No JSON found in response, trying LLM fix');
+          // Third attempt: call LLM again to fix JSON
+          const fixPrompt = `Fix the JSON only: ${response}`;
+          const fixedResponse = await this.callGeminiAPI(fixPrompt, 0.0);
+          console.log('Fixed response:', fixedResponse.substring(0, 300));
+          itinerary = JSON.parse(fixedResponse);
         }
       } catch (regexError) {
-        // Third attempt: call LLM again to fix JSON
-        const fixPrompt = `Fix the JSON only: ${response}`;
-        const fixedResponse = await this.callGeminiAPI(fixPrompt, 0.0);
-        itinerary = JSON.parse(fixedResponse);
+        console.error('All JSON parsing attempts failed:', regexError);
+        throw regexError;
       }
     }
 
