@@ -56,8 +56,8 @@ ALL numbers must be integers. ALL strings in quotes. NO markdown formatting.`;
 
     // Cost reduction strategy: limit date range
     const duration = this.calculateDays(request.startDate, request.endDate);
-    if (duration > 10) {
-      throw new Error('DATE_RANGE_TOO_LONG: Please split trips longer than 10 days into smaller chunks');
+    if (duration > 14) {
+      throw new Error('DATE_RANGE_TOO_LONG: Please split trips longer than 14 days into smaller chunks');
     }
 
     // Build destination snippet for RAG (150-300 tokens max)
