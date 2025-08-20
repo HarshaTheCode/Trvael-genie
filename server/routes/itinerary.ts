@@ -232,39 +232,39 @@ export const saveEmail: RequestHandler = async (req, res) => {
   }
 };
 
-// PDF generation endpoint (placeholder for MVP)
+import { PDFExportService } from '../services/pdf-export';
+
+// Professional PDF generation endpoint
 export const generatePDF: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    
+    const { format = 'html' } = req.query; // 'html' or 'text'
+
     const storedItinerary = itineraries.get(id);
     if (!storedItinerary) {
       return res.status(404).json({ error: 'Itinerary not found' });
     }
 
-    // For MVP, return a simple text representation
-    // In production, use libraries like puppeteer or jsPDF
     const itinerary = storedItinerary.output_json;
-    
-    let pdfContent = `${itinerary.title}\n\n`;
-    pdfContent += `Destination: ${itinerary.meta.destination}\n`;
-    pdfContent += `Dates: ${itinerary.meta.start_date} to ${itinerary.meta.end_date}\n`;
-    pdfContent += `Travelers: ${itinerary.meta.travelers}\n\n`;
-    
-    itinerary.days.forEach((day: any) => {
-      pdfContent += `Day ${day.day} (${day.date}):\n`;
-      day.segments.forEach((segment: any) => {
-        pdfContent += `${segment.time} - ${segment.place} (${segment.duration_min}min)\n`;
-        pdfContent += `  ${segment.note}\n`;
-        if (segment.food) pdfContent += `  Food: ${segment.food}\n`;
-      });
-      pdfContent += `Tip: ${day.daily_tip}\n\n`;
-    });
 
-    res.setHeader('Content-Type', 'text/plain');
-    res.setHeader('Content-Disposition', `attachment; filename="itinerary-${id}.txt"`);
-    res.send(pdfContent);
-    
+    if (format === 'html') {
+      // Return HTML for PDF generation (can be used with puppeteer)
+      const htmlContent = PDFExportService.generateHTML(itinerary);
+      const filename = PDFExportService.getFilename(itinerary);
+
+      res.setHeader('Content-Type', 'text/html');
+      res.setHeader('Content-Disposition', `inline; filename="${filename.replace('.pdf', '.html')}"`);
+      res.send(htmlContent);
+    } else {
+      // Return professionally formatted text
+      const pdfContent = PDFExportService.generateProfessionalPDF(itinerary);
+      const filename = PDFExportService.getFilename(itinerary);
+
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename.replace('.pdf', '.txt')}"`);
+      res.send(pdfContent);
+    }
+
   } catch (error) {
     console.error('PDF generation error:', error);
     res.status(500).json({ error: 'PDF generation failed' });
