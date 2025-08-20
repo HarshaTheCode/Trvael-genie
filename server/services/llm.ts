@@ -7,48 +7,48 @@ export class LLMService {
   private static readonly API_KEY = process.env.GEMINI_API_KEY;
 
   // Primary LLM system prompt (meta)
-  private static readonly SYSTEM_PROMPT = `You are an expert Indian travel planner that returns MACHINE-READABLE JSON matching the given schema exactly. Use the local facts provided. Keep descriptions concise (<= 20 words).
+  private static readonly SYSTEM_PROMPT = `You are an expert Indian travel planner. Return ONLY valid JSON matching this schema exactly. No markdown, no explanation, no extra text.
 
-CRITICAL: Return ONLY valid JSON. No markdown, no explanation, no extra text.
+CRITICAL: Ensure the JSON is complete and properly closed. For multi-day trips, include ALL days with complete segments.
 
-JSON Schema (REQUIRED):
+JSON Schema:
 {
-  "title": "3-day Delhi Cultural Tour",
+  "title": "X-day [Destination] [Style] Tour",
   "meta": {
-    "destination": "Delhi, India",
-    "start_date": "2025-08-20",
-    "end_date": "2025-08-20",
-    "travelers": "2 adults",
-    "budget": "medium",
-    "style": "culture"
+    "destination": "[City], India",
+    "start_date": "YYYY-MM-DD",
+    "end_date": "YYYY-MM-DD", 
+    "travelers": "[number] adults",
+    "budget": "low|medium|high",
+    "style": "culture|adventure|relaxation|food|shopping"
   },
   "days": [
     {
       "day": 1,
-      "date": "2025-08-20",
+      "date": "YYYY-MM-DD",
       "segments": [
         {
-          "time": "09:00",
-          "place": "Red Fort",
-          "duration_min": 120,
-          "note": "UNESCO World Heritage site with Mughal architecture",
+          "time": "HH:MM",
+          "place": "Place name",
+          "duration_min": 60,
+          "note": "Brief description (max 15 words)",
           "transport_min_to_next": 15,
-          "food": "Try paranthas at Chandni Chowk"
+          "food": "Food recommendation"
         }
       ],
-      "daily_tip": "Start early to avoid crowds and heat"
+      "daily_tip": "One practical tip for the day"
     }
   ],
   "budget_estimate": {
-    "low": 3000,
-    "median": 7000,
-    "high": 15000
+    "low": 1000,
+    "median": 3000,
+    "high": 8000
   },
-  "generated_at": "2025-01-20T10:30:00Z",
-  "source_facts": ["Red Fort opens 9:30 AM", "Entry fee ₹35 for Indians"]
+  "generated_at": "ISO timestamp",
+  "source_facts": ["Fact 1", "Fact 2"]
 }
 
-ALL numbers must be integers. ALL strings in quotes. NO markdown formatting.`;
+Rules: ALL numbers as integers, ALL strings in quotes, complete JSON structure.`;
 
   static async generateItinerary(
     request: TravelRequest,
@@ -84,18 +84,20 @@ Travel Pace: ${request.travelPace || "moderate"}
 ${request.customRequirements ? `Special Requirements: ${request.customRequirements}` : ""}
 ${request.accessibility ? `Accessibility Needs: ${request.accessibility}` : ""}
 
-Generate EXACTLY ONE JSON object matching the provided itinerary schema.
+Generate EXACTLY ONE COMPLETE JSON object matching the provided itinerary schema.
 
-IMPORTANT REQUIREMENTS:
+CRITICAL REQUIREMENTS:
 - Use the EXACT destination "${request.destination}" in all references
 - Focus heavily on ${request.style} experiences and activities
 - Include specific local attractions mentioned in the context above
 - Match the ${request.travelPace || "moderate"} pace (slow=2-3 places/day, moderate=4-5, fast=6+)
 - Budget estimates in INR rounded to nearest 100
-- Keep descriptions under 20 words
+- Keep descriptions under 15 words
+- Ensure ALL days are included with complete segments
+- Generate COMPLETE and properly closed JSON structure
 ${request.customRequirements ? `- Address these special requests: ${request.customRequirements}` : ""}
 
-Do not include commentary outside the JSON.`;
+Return ONLY the JSON object - no markdown, no explanations, no extra text.`;
 
     let attempts = 0;
     const maxAttempts = 2;
@@ -139,37 +141,55 @@ Do not include commentary outside the JSON.`;
       ],
       generationConfig: {
         temperature: temperature,
-        maxOutputTokens: 1500,
+        maxOutputTokens: 4000,
         topK: 40,
         topP: 0.95,
       },
     };
 
-    const response = await fetch(`${this.GEMINI_API_URL}?key=${this.API_KEY}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+    
+    try {
+      const response = await fetch(`${this.GEMINI_API_URL}?key=${this.API_KEY}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
+      
+      clearTimeout(timeoutId);
+      
+            if (response.status === 429) {
+        throw new Error("Rate limit exceeded. Please try again in a few minutes.");
+      }
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Gemini API error:", response.status, errorText);
-      throw new Error(`Gemini API error: ${response.status}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Gemini API error:", response.status, errorText);
+        throw new Error(`Gemini API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (
+        !data.candidates ||
+        !data.candidates[0] ||
+        !data.candidates[0].content
+      ) {
+        throw new Error("No content in Gemini response");
+      }
+
+      return data.candidates[0].content.parts[0].text;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        throw new Error("Request timed out. Please try again.");
+      }
+      throw error;
     }
-
-    const data = await response.json();
-
-    if (
-      !data.candidates ||
-      !data.candidates[0] ||
-      !data.candidates[0].content
-    ) {
-      throw new Error("No content in Gemini response");
-    }
-
-    return data.candidates[0].content.parts[0].text;
   }
 
   private static async parseAndValidateResponse(
@@ -187,11 +207,42 @@ Do not include commentary outside the JSON.`;
     } catch (parseError) {
       console.log("Direct JSON parse failed, trying regex extraction");
       try {
-        // Second attempt: extract JSON with regex
+        // Second attempt: extract JSON with regex and try to complete it
         const jsonMatch = response.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
-          console.log("Extracted JSON:", jsonMatch[0].substring(0, 300));
-          itinerary = JSON.parse(jsonMatch[0]);
+          let jsonText = jsonMatch[0];
+          console.log("Extracted JSON:", jsonText.substring(0, 300));
+          
+          // Try to complete incomplete JSON
+          if (!jsonText.trim().endsWith('}')) {
+            console.log("JSON appears incomplete, attempting to complete...");
+            // Add missing closing braces for common incomplete structures
+            const openBraces = (jsonMatch[0].match(/\{/g) || []).length;
+            const closeBraces = (jsonMatch[0].match(/\}/g) || []).length;
+            const openBrackets = (jsonMatch[0].match(/\[/g) || []).length;
+            const closeBrackets = (jsonMatch[0].match(/\]/g) || []).length;
+            
+            // Add missing closing brackets
+            while (closeBrackets < openBrackets) {
+              jsonText += ']';
+            }
+            while (closeBraces < openBraces) {
+              jsonText += '}';
+            }
+            
+            console.log("Completed JSON attempt:", jsonText.substring(0, 300));
+          }
+          
+          try {
+            itinerary = JSON.parse(jsonText);
+          } catch (completeError) {
+            console.log("Completed JSON still invalid, trying LLM fix");
+            // Third attempt: call LLM again to fix JSON
+            const fixPrompt = `Complete and fix this incomplete JSON: ${response}`;
+            const fixedResponse = await this.callGeminiAPI(fixPrompt, 0.0);
+            console.log("Fixed response:", fixedResponse.substring(0, 300));
+            itinerary = JSON.parse(fixedResponse);
+          }
         } else {
           console.log("No JSON found in response, trying LLM fix");
           // Third attempt: call LLM again to fix JSON

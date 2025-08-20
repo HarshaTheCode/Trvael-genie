@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import { randomUUID } from "crypto";
 import crypto from "crypto";
 import { ItineraryResponse, TravelRequest } from "@shared/api";
+import { SupabaseService } from "../services/supabase";
 
 // In-memory storage for development (replace with database)
 interface SavedItinerary {
@@ -95,25 +96,52 @@ export const getUserItineraries: RequestHandler = async (req: any, res) => {
       });
     }
 
-    const userItineraries = Array.from(savedItineraries.values())
-      .filter((itinerary) => itinerary.userId === req.user.id)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-      .map((itinerary) => ({
-        id: itinerary.id,
-        title: itinerary.title,
-        destination: itinerary.originalRequest.destination,
-        startDate: itinerary.originalRequest.startDate,
-        endDate: itinerary.originalRequest.endDate,
-        travelers: itinerary.originalRequest.travelers,
-        budget: itinerary.originalRequest.budget,
-        style: itinerary.originalRequest.style,
-        createdAt: itinerary.createdAt,
-        updatedAt: itinerary.updatedAt,
-        favorite: itinerary.favorite,
-        tags: itinerary.tags,
-        isPublic: itinerary.isPublic,
-        publicShareId: itinerary.publicShareId,
-      }));
+    // Try to get from Supabase first
+    let userItineraries = [];
+    
+    try {
+      userItineraries = await SupabaseService.getUserItineraries(req.user.id);
+      
+      // Transform Supabase data to match expected format
+      if (userItineraries.length > 0) {
+        userItineraries = userItineraries.map(item => ({
+          id: item.id,
+          title: item.output_json?.title || `Trip to ${item.input_payload?.destination || 'Unknown'}`,
+          destination: item.input_payload?.destination || 'Unknown',
+          startDate: item.input_payload?.startDate || '',
+          endDate: item.input_payload?.endDate || '',
+          createdAt: new Date(item.created_at),
+          favorite: false, // Default value
+          tags: [], // Default value
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching from Supabase:', error);
+      console.log('Falling back to in-memory storage');
+    }
+    
+    // Fallback to in-memory storage if Supabase failed or returned no results
+    if (userItineraries.length === 0) {
+      userItineraries = Array.from(savedItineraries.values())
+        .filter((itinerary) => itinerary.userId === req.user.id)
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+        .map((itinerary) => ({
+          id: itinerary.id,
+          title: itinerary.title,
+          destination: itinerary.originalRequest.destination,
+          startDate: itinerary.originalRequest.startDate,
+          endDate: itinerary.originalRequest.endDate,
+          travelers: itinerary.originalRequest.travelers,
+          budget: itinerary.originalRequest.budget,
+          style: itinerary.originalRequest.style,
+          createdAt: itinerary.createdAt,
+          updatedAt: itinerary.updatedAt,
+          favorite: itinerary.favorite,
+          tags: itinerary.tags,
+          isPublic: itinerary.isPublic,
+          publicShareId: itinerary.publicShareId,
+        }));
+    }
 
     res.json({
       success: true,
@@ -127,7 +155,7 @@ export const getUserItineraries: RequestHandler = async (req: any, res) => {
       message: "Failed to fetch itineraries",
     });
   }
-};
+}
 
 /**
  * Get a specific saved itinerary

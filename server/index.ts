@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
+import { initializeDatabase } from "./database/init";
 import {
   generateItinerary,
   getItinerary,
@@ -37,8 +38,11 @@ import {
   authenticateAdmin,
 } from "./services/auth";
 
-export function createServer() {
+export async function createServer() {
   const app = express();
+
+  // Initialize database
+  await initializeDatabase();
 
   // Middleware
   app.use(cors());

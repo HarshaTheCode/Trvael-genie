@@ -10,6 +10,7 @@ import {
 import { LLMService } from "../services/llm";
 import { CacheService } from "../services/cache";
 import { ValidationService } from "../services/validation";
+import { SupabaseService } from "../services/supabase";
 
 // In-memory storage for development - in production, use PostgreSQL/Supabase
 const itineraries = new Map();
@@ -87,16 +88,34 @@ export const generateItinerary: RequestHandler = async (req, res) => {
       // Cache the result
       CacheService.setCachedItinerary(cacheKey, itinerary);
 
-      // Store in database
+      // Store in Supabase database
       const itineraryId = randomUUID();
-      itineraries.set(itineraryId, {
-        id: itineraryId,
-        user_id: request.userId,
-        input_payload: normalizedRequest,
-        output_json: itinerary,
-        cached_key: cacheKey,
-        created_at: new Date().toISOString(),
-      });
+      let storedItinerary = null;
+      
+      try {
+        storedItinerary = await SupabaseService.storeItinerary({
+          id: itineraryId,
+          user_id: request.userId,
+          input_payload: normalizedRequest,
+          output_json: itinerary,
+          cached_key: cacheKey,
+        });
+      } catch (error) {
+        console.error('Failed to store itinerary in Supabase:', error);
+      }
+
+      if (!storedItinerary) {
+        console.log('Falling back to in-memory storage');
+        // Fallback to in-memory storage
+        itineraries.set(itineraryId, {
+          id: itineraryId,
+          user_id: request.userId,
+          input_payload: normalizedRequest,
+          output_json: itinerary,
+          cached_key: cacheKey,
+          created_at: new Date().toISOString(),
+        });
+      }
 
       const response: GenerateItineraryResponse = {
         success: true,
@@ -113,20 +132,37 @@ export const generateItinerary: RequestHandler = async (req, res) => {
         if (error.message === "LLM_INVALID_JSON") {
           return res.status(502).json({
             success: false,
-            error: "LLM_INVALID_JSON",
+            error: "LLM_INVALID_JSON: Failed to generate valid itinerary. Please try again.",
           });
         } else if (error.message.startsWith("DATE_RANGE_TOO_LONG")) {
           return res.status(400).json({
             success: false,
             error:
-              "DATE_RANGE_TOO_LONG: Please split trips longer than 10 days into smaller chunks",
+              "DATE_RANGE_TOO_LONG: Please split trips longer than 14 days into smaller chunks",
+          });
+        } else if (error.message.includes("Rate limit exceeded")) {
+          return res.status(429).json({
+            success: false,
+            error: "Rate limit exceeded. Please wait a few minutes and try again.",
+          });
+        } else if (error.message.includes("timed out")) {
+          return res.status(408).json({
+            success: false,
+            error: "Request timed out. Please try again.",
+          });
+        } else if (error.message.includes("GEMINI_API_KEY not configured")) {
+          return res.status(500).json({
+            success: false,
+            error: "API configuration error. Please contact support.",
           });
         }
       }
 
+      // Log the actual error for debugging
+      console.error("Unhandled LLM error:", error);
       res.status(502).json({
         success: false,
-        error: "LLM_TIMEOUT",
+        error: "LLM_ERROR: " + (error instanceof Error ? error.message : "Unknown error"),
       });
     }
   } catch (error) {
@@ -142,7 +178,14 @@ export const getItinerary: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const storedItinerary = itineraries.get(id);
+    // Try to get from Supabase first
+    let storedItinerary = await SupabaseService.getItineraryById(id);
+    
+    // Fallback to in-memory storage if not found in Supabase
+    if (!storedItinerary) {
+      storedItinerary = itineraries.get(id);
+    }
+    
     if (!storedItinerary) {
       return res.status(404).json({
         success: false,
@@ -152,7 +195,7 @@ export const getItinerary: RequestHandler = async (req, res) => {
 
     const response: GetItineraryResponse = {
       success: true,
-      itinerary: storedItinerary,
+      itinerary: storedItinerary.output_json || storedItinerary,
     };
 
     res.json(response);
