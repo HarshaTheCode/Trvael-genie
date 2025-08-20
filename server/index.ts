@@ -7,14 +7,14 @@ import {
   getItinerary,
   exportItinerary,
   saveEmail,
-  generatePDF
+  generatePDF,
 } from "./routes/itinerary";
 import {
   sendMagicLink,
   verifyMagicLink,
   getCurrentUser,
   logout,
-  refreshToken
+  refreshToken,
 } from "./routes/auth";
 import {
   saveItinerary,
@@ -23,22 +23,26 @@ import {
   generateShareLink,
   getPublicItinerary,
   deleteItinerary,
-  updateItinerary
+  updateItinerary,
 } from "./routes/saved-itineraries";
 import {
   submitFeedback,
   getFeedbackStats,
   checkUserFeedback,
-  getAllFeedback
+  getAllFeedback,
 } from "./routes/feedback";
-import { authenticateJWT, optionalAuth, authenticateAdmin } from "./services/auth";
+import {
+  authenticateJWT,
+  optionalAuth,
+  authenticateAdmin,
+} from "./services/auth";
 
 export function createServer() {
   const app = express();
 
   // Middleware
   app.use(cors());
-  app.use(express.json({ limit: '10mb' }));
+  app.use(express.json({ limit: "10mb" }));
   app.use(express.urlencoded({ extended: true }));
 
   // Health check routes
