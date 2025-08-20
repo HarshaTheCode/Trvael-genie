@@ -1,15 +1,21 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Compass, Mail, Loader2, ArrowLeft } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Compass, Mail, Loader2, ArrowLeft } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 export default function Login() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isEmailSent, setIsEmailSent] = useState(false);
   const { login, isAuthenticated } = useAuth();
@@ -17,14 +23,14 @@ export default function Login() {
 
   // Redirect if already authenticated
   if (isAuthenticated) {
-    navigate('/');
+    navigate("/");
     return null;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !email.includes('@')) {
-      toast.error('Please enter a valid email address');
+    if (!email || !email.includes("@")) {
+      toast.error("Please enter a valid email address");
       return;
     }
 
@@ -38,7 +44,7 @@ export default function Login() {
         toast.error(result.message);
       }
     } catch (error) {
-      toast.error('Failed to send magic link. Please try again.');
+      toast.error("Failed to send magic link. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -49,12 +55,12 @@ export default function Login() {
     try {
       const result = await login(email);
       if (result.success) {
-        toast.success('Magic link sent again!');
+        toast.success("Magic link sent again!");
       } else {
         toast.error(result.message);
       }
     } catch (error) {
-      toast.error('Failed to resend magic link. Please try again.');
+      toast.error("Failed to resend magic link. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -65,7 +71,10 @@ export default function Login() {
       <div className="w-full max-w-md space-y-6">
         {/* Header */}
         <div className="text-center">
-          <Link to="/" className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 mb-4">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 mb-4"
+          >
             <ArrowLeft className="h-4 w-4" />
             Back to TravelGenie
           </Link>
@@ -81,13 +90,12 @@ export default function Login() {
         <Card className="shadow-xl">
           <CardHeader>
             <CardTitle className="text-center">
-              {isEmailSent ? 'Check Your Email' : 'Sign In'}
+              {isEmailSent ? "Check Your Email" : "Sign In"}
             </CardTitle>
             <CardDescription className="text-center">
-              {isEmailSent 
-                ? 'We sent you a magic link to sign in'
-                : 'Enter your email to receive a magic link'
-              }
+              {isEmailSent
+                ? "We sent you a magic link to sign in"
+                : "Enter your email to receive a magic link"}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -106,8 +114,8 @@ export default function Login() {
                   />
                 </div>
 
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="w-full bg-orange-600 hover:bg-orange-700"
                   disabled={isLoading}
                 >
@@ -138,8 +146,8 @@ export default function Login() {
                   <p className="text-sm text-gray-600">
                     Didn't receive the email? Check your spam folder or
                   </p>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={handleResendEmail}
                     disabled={isLoading}
                     className="w-full"
@@ -150,16 +158,16 @@ export default function Login() {
                         Resending...
                       </>
                     ) : (
-                      'Resend Magic Link'
+                      "Resend Magic Link"
                     )}
                   </Button>
                 </div>
 
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   onClick={() => {
                     setIsEmailSent(false);
-                    setEmail('');
+                    setEmail("");
                   }}
                   className="w-full"
                 >

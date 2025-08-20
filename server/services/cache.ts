@@ -1,5 +1,5 @@
-import crypto from 'crypto';
-import { TravelRequest, ItineraryResponse } from '@shared/api';
+import crypto from "crypto";
+import { TravelRequest, ItineraryResponse } from "@shared/api";
 
 // In-memory cache for development - in production, use Redis
 const cache = new Map<string, { data: ItineraryResponse; expires: number }>();
@@ -18,19 +18,19 @@ export class CacheService {
       travelers: request.travelers.toLowerCase().trim(),
       budget: request.budget,
       style: request.style,
-      origin: request.origin?.toLowerCase().trim() || '',
-      language: request.language || 'en'
+      origin: request.origin?.toLowerCase().trim() || "",
+      language: request.language || "en",
     };
 
     // Sort keys for consistent hashing
     const sortedKeys = Object.keys(normalized).sort();
     const sortedObj: any = {};
-    sortedKeys.forEach(key => {
+    sortedKeys.forEach((key) => {
       sortedObj[key] = normalized[key as keyof typeof normalized];
     });
 
     const str = JSON.stringify(sortedObj);
-    return crypto.createHash('md5').update(str).digest('hex');
+    return crypto.createHash("md5").update(str).digest("hex");
   }
 
   static getCachedItinerary(cacheKey: string): ItineraryResponse | null {
@@ -45,23 +45,29 @@ export class CacheService {
     return cached.data;
   }
 
-  static setCachedItinerary(cacheKey: string, itinerary: ItineraryResponse): void {
+  static setCachedItinerary(
+    cacheKey: string,
+    itinerary: ItineraryResponse,
+  ): void {
     cache.set(cacheKey, {
       data: itinerary,
-      expires: Date.now() + this.CACHE_TTL
+      expires: Date.now() + this.CACHE_TTL,
     });
   }
 
-  static checkRateLimit(userIdOrIP: string, isRegistered: boolean = false): { allowed: boolean; creditsLeft: number } {
+  static checkRateLimit(
+    userIdOrIP: string,
+    isRegistered: boolean = false,
+  ): { allowed: boolean; creditsLeft: number } {
     const now = Date.now();
     let rateLimit = rateLimits.get(userIdOrIP);
 
     // Reset credits if 24 hours have passed
-    if (!rateLimit || (now - rateLimit.lastReset) > this.RATE_RESET_INTERVAL) {
+    if (!rateLimit || now - rateLimit.lastReset > this.RATE_RESET_INTERVAL) {
       const maxCredits = isRegistered ? 50 : 20; // Increased limits for development
       rateLimit = {
         credits: maxCredits,
-        lastReset: now
+        lastReset: now,
       };
       rateLimits.set(userIdOrIP, rateLimit);
     }
@@ -82,7 +88,7 @@ export class CacheService {
     if (!rateLimit) return 3; // Default for new users
 
     const now = Date.now();
-    if ((now - rateLimit.lastReset) > this.RATE_RESET_INTERVAL) {
+    if (now - rateLimit.lastReset > this.RATE_RESET_INTERVAL) {
       return 3; // Credits would be reset
     }
 
@@ -92,7 +98,7 @@ export class CacheService {
   // Cleanup old entries periodically
   static cleanup(): void {
     const now = Date.now();
-    
+
     // Clean expired cache entries
     for (const [key, value] of cache.entries()) {
       if (now > value.expires) {
@@ -102,7 +108,7 @@ export class CacheService {
 
     // Clean old rate limit entries (older than 48 hours)
     for (const [key, value] of rateLimits.entries()) {
-      if ((now - value.lastReset) > (2 * this.RATE_RESET_INTERVAL)) {
+      if (now - value.lastReset > 2 * this.RATE_RESET_INTERVAL) {
         rateLimits.delete(key);
       }
     }
@@ -110,6 +116,9 @@ export class CacheService {
 }
 
 // Run cleanup every hour
-setInterval(() => {
-  CacheService.cleanup();
-}, 60 * 60 * 1000);
+setInterval(
+  () => {
+    CacheService.cleanup();
+  },
+  60 * 60 * 1000,
+);

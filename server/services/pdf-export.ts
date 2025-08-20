@@ -1,4 +1,4 @@
-import { ItineraryResponse } from '@shared/api';
+import { ItineraryResponse } from "@shared/api";
 
 export class PDFExportService {
   /**
@@ -9,85 +9,100 @@ export class PDFExportService {
     const lines: string[] = [];
 
     // Header
-    lines.push('═'.repeat(80));
+    lines.push("═".repeat(80));
     lines.push(`                    ${itinerary.title.toUpperCase()}`);
-    lines.push('═'.repeat(80));
-    lines.push('');
+    lines.push("═".repeat(80));
+    lines.push("");
 
     // Trip Overview
-    lines.push('📍 TRIP OVERVIEW');
-    lines.push('─'.repeat(50));
+    lines.push("📍 TRIP OVERVIEW");
+    lines.push("─".repeat(50));
     lines.push(`Destination:     ${itinerary.meta.destination}`);
-    lines.push(`Travel Dates:    ${itinerary.meta.start_date} to ${itinerary.meta.end_date}`);
+    lines.push(
+      `Travel Dates:    ${itinerary.meta.start_date} to ${itinerary.meta.end_date}`,
+    );
     lines.push(`Travelers:       ${itinerary.meta.travelers}`);
     lines.push(`Budget Tier:     ${itinerary.meta.budget.toUpperCase()}`);
     lines.push(`Travel Style:    ${itinerary.meta.style.toUpperCase()}`);
-    lines.push('');
+    lines.push("");
 
     // Budget Estimate
-    lines.push('💰 BUDGET ESTIMATE (Per Person)');
-    lines.push('─'.repeat(50));
-    lines.push(`Budget Range:    ₹${itinerary.budget_estimate.low.toLocaleString()} - ₹${itinerary.budget_estimate.high.toLocaleString()}`);
-    lines.push(`Recommended:     ₹${itinerary.budget_estimate.median.toLocaleString()}`);
-    lines.push('');
+    lines.push("💰 BUDGET ESTIMATE (Per Person)");
+    lines.push("─".repeat(50));
+    lines.push(
+      `Budget Range:    ₹${itinerary.budget_estimate.low.toLocaleString()} - ₹${itinerary.budget_estimate.high.toLocaleString()}`,
+    );
+    lines.push(
+      `Recommended:     ₹${itinerary.budget_estimate.median.toLocaleString()}`,
+    );
+    lines.push("");
 
     // Daily Itinerary
-    lines.push('📅 DETAILED ITINERARY');
-    lines.push('═'.repeat(80));
+    lines.push("📅 DETAILED ITINERARY");
+    lines.push("═".repeat(80));
 
     itinerary.days.forEach((day, index) => {
       // Day header
-      lines.push('');
-      lines.push(`DAY ${day.day} - ${new Date(day.date).toLocaleDateString('en-US', { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      })}`);
-      lines.push('─'.repeat(60));
+      lines.push("");
+      lines.push(
+        `DAY ${day.day} - ${new Date(day.date).toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}`,
+      );
+      lines.push("─".repeat(60));
 
       // Day segments
       day.segments.forEach((segment, segIndex) => {
         lines.push(`${segment.time}    ${segment.place}`);
         lines.push(`          Duration: ${segment.duration_min} minutes`);
         lines.push(`          ${segment.note}`);
-        
+
         if (segment.food) {
           lines.push(`          🍽️  ${segment.food}`);
         }
-        
-        if (segment.transport_min_to_next > 0 && segIndex < day.segments.length - 1) {
-          lines.push(`          🚗 Travel time to next: ${segment.transport_min_to_next} minutes`);
+
+        if (
+          segment.transport_min_to_next > 0 &&
+          segIndex < day.segments.length - 1
+        ) {
+          lines.push(
+            `          🚗 Travel time to next: ${segment.transport_min_to_next} minutes`,
+          );
         }
-        
-        lines.push('');
+
+        lines.push("");
       });
 
       // Daily tip
       if (day.daily_tip) {
         lines.push(`💡 Daily Tip: ${day.daily_tip}`);
-        lines.push('');
+        lines.push("");
       }
     });
 
     // Useful Information
     if (itinerary.source_facts && itinerary.source_facts.length > 0) {
-      lines.push('ℹ️  USEFUL INFORMATION');
-      lines.push('─'.repeat(50));
-      itinerary.source_facts.forEach(fact => {
+      lines.push("ℹ️  USEFUL INFORMATION");
+      lines.push("─".repeat(50));
+      itinerary.source_facts.forEach((fact) => {
         lines.push(`• ${fact}`);
       });
-      lines.push('');
+      lines.push("");
     }
 
     // Footer
-    lines.push('─'.repeat(80));
-    lines.push(`Generated on: ${new Date(itinerary.generated_at).toLocaleString()}`);
-    lines.push('Powered by TravelGenie - AI Travel Planning for India');
-    lines.push('Visit: https://travelgenie.com');
-    lines.push('═'.repeat(80));
+    lines.push("─".repeat(80));
+    lines.push(
+      `Generated on: ${new Date(itinerary.generated_at).toLocaleString()}`,
+    );
+    lines.push("Powered by TravelGenie - AI Travel Planning for India");
+    lines.push("Visit: https://travelgenie.com");
+    lines.push("═".repeat(80));
 
-    return lines.join('\n');
+    return lines.join("\n");
   }
 
   /**
@@ -320,18 +335,25 @@ export class PDFExportService {
             </div>
         </div>
 
-        ${itinerary.days.map((day, index) => `
+        ${itinerary.days
+          .map(
+            (day, index) => `
             <div class="day">
                 <div class="day-header">
-                    Day ${day.day} - ${new Date(day.date).toLocaleDateString('en-US', { 
-                        weekday: 'long', 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                    })}
+                    Day ${day.day} - ${new Date(day.date).toLocaleDateString(
+                      "en-US",
+                      {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      },
+                    )}
                 </div>
                 <div class="day-content">
-                    ${day.segments.map((segment, segIndex) => `
+                    ${day.segments
+                      .map(
+                        (segment, segIndex) => `
                         <div class="segment">
                             <div class="segment-header">
                                 <span class="segment-time">${segment.time}</span>
@@ -339,29 +361,45 @@ export class PDFExportService {
                                 <span class="segment-duration">${segment.duration_min} min</span>
                             </div>
                             <div class="segment-note">${segment.note}</div>
-                            ${segment.food ? `<div class="segment-food">🍽️ ${segment.food}</div>` : ''}
-                            ${segment.transport_min_to_next > 0 && segIndex < day.segments.length - 1 ? 
-                                `<div class="segment-transport">🚗 Travel time to next: ${segment.transport_min_to_next} minutes</div>` : ''}
+                            ${segment.food ? `<div class="segment-food">🍽️ ${segment.food}</div>` : ""}
+                            ${
+                              segment.transport_min_to_next > 0 &&
+                              segIndex < day.segments.length - 1
+                                ? `<div class="segment-transport">🚗 Travel time to next: ${segment.transport_min_to_next} minutes</div>`
+                                : ""
+                            }
                         </div>
-                    `).join('')}
-                    ${day.daily_tip ? `
+                    `,
+                      )
+                      .join("")}
+                    ${
+                      day.daily_tip
+                        ? `
                         <div class="daily-tip">
                             <div class="daily-tip-label">💡 Daily Tip:</div>
                             <div>${day.daily_tip}</div>
                         </div>
-                    ` : ''}
+                    `
+                        : ""
+                    }
                 </div>
             </div>
-        `).join('')}
+        `,
+          )
+          .join("")}
 
-        ${itinerary.source_facts && itinerary.source_facts.length > 0 ? `
+        ${
+          itinerary.source_facts && itinerary.source_facts.length > 0
+            ? `
             <div class="useful-info">
                 <h2>ℹ️ Useful Information</h2>
                 <ul>
-                    ${itinerary.source_facts.map(fact => `<li>${fact}</li>`).join('')}
+                    ${itinerary.source_facts.map((fact) => `<li>${fact}</li>`).join("")}
                 </ul>
             </div>
-        ` : ''}
+        `
+            : ""
+        }
 
         <div class="footer">
             <p>Generated on: ${new Date(itinerary.generated_at).toLocaleString()}</p>
@@ -377,7 +415,10 @@ export class PDFExportService {
    * Get appropriate filename for the PDF
    */
   static getFilename(itinerary: ItineraryResponse): string {
-    const destination = itinerary.meta.destination.replace(/[^a-zA-Z0-9]/g, '-');
+    const destination = itinerary.meta.destination.replace(
+      /[^a-zA-Z0-9]/g,
+      "-",
+    );
     const startDate = itinerary.meta.start_date;
     return `TravelGenie-${destination}-${startDate}.pdf`;
   }
