@@ -6,11 +6,17 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, Calendar, Users, DollarSign, Compass, Loader2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { MapPin, Calendar, Users, DollarSign, Compass, Loader2, Save, Share2, ThumbsUp, ThumbsDown, Download, Edit, User, LogOut, BookMarked } from 'lucide-react';
 import { TravelRequest, GenerateItineraryResponse } from '@shared/api';
 import { DestinationSuggestions } from '@/components/DestinationSuggestions';
+import { useAuth, useAuthenticatedFetch } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 export default function Index() {
+  const { user, isAuthenticated, logout } = useAuth();
+  const authenticatedFetch = useAuthenticatedFetch();
+
   const [formData, setFormData] = useState<TravelRequest>({
     destination: '',
     startDate: '',
@@ -24,10 +30,16 @@ export default function Index() {
     accessibility: '',
     travelPace: 'moderate'
   });
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [generatedItinerary, setGeneratedItinerary] = useState<GenerateItineraryResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [feedbackGiven, setFeedbackGiven] = useState<number | null>(null);
+  const [hasGivenFeedback, setHasGivenFeedback] = useState(false);
 
   const handleInputChange = (field: keyof TravelRequest, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
