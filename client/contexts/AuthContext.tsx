@@ -13,6 +13,9 @@ interface User {
   creditsRemaining: number;
   isAdmin: boolean;
   emailVerified: boolean;
+  user_metadata?: {
+    [key: string]: any;
+  };
 }
 
 interface AuthContextType {

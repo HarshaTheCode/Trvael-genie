@@ -3,8 +3,8 @@ import { Database } from '../types/database';
 
 // Supabase client configuration
 const supabaseUrl = process.env.SUPABASE_URL || 'https://hyhmvmqvmmaiajhjmtkk.supabase.co';
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || 'your-anon-key-here';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'your-service-role-key-here';
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5aG12bXF2bW1haWFqaGptdGtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTc0MzA4MDAsImV4cCI6MjAzMzAwNjgwMH0.Nh0fPXLQnpZ-5oULQQVXCmXHk2D9gNCRUlMvWAzEI-I';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5aG12bXF2bW1haWFqaGptdGtrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcxNzQzMDgwMCwiZXhwIjoyMDMzMDA2ODAwfQ.Nh0fPXLQnpZ-5oULQQVXCmXHk2D9gNCRUlMvWAzEI-I';
 
 // Create Supabase client for server-side operations
 export const supabase = createClient<Database>(supabaseUrl, supabaseServiceKey, {
