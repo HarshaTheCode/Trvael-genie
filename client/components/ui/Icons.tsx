@@ -1,7 +1,6 @@
-import { 
-  Mail, 
-  Spinner, 
-  Github, 
+import {
+  Mail,
+  Github,
   Chrome,
   Loader2
 } from 'lucide-react';
@@ -11,5 +10,5 @@ export const Icons = {
   mail: Mail,
   google: Chrome,
   gitHub: Github,
-  loading: Spinner,
+  loading: Loader2,
 };
