@@ -31,10 +31,19 @@ function expressPlugin(): Plugin {
     apply: "serve", // Only apply during development (serve mode)
     configureServer(server) {
       createServer().then(app => {
+        console.log('Express app created and ready');
+
         // Add Express app as middleware to Vite dev server
         server.middlewares.use((req, res, next) => {
           if (req.url?.startsWith('/api')) {
-            app(req, res, next);
+            console.log(`API request: ${req.method} ${req.url}`);
+            // Call the Express app directly
+            app(req, res, (err: any) => {
+              if (err) {
+                console.error('Express middleware error:', err);
+              }
+              next(err);
+            });
           } else {
             next();
           }
