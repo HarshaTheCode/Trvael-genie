@@ -1,5 +1,5 @@
-import { RequestHandler } from 'express';
-import { randomUUID } from 'crypto';
+import { RequestHandler } from "express";
+import { randomUUID } from "crypto";
 
 // In-memory storage for development (replace with database)
 interface ItineraryFeedback {
@@ -25,14 +25,14 @@ export const submitFeedback: RequestHandler = async (req: any, res) => {
     if (!itineraryId) {
       return res.status(400).json({
         success: false,
-        message: 'Itinerary ID is required'
+        message: "Itinerary ID is required",
       });
     }
 
     if (feedbackValue !== 1 && feedbackValue !== -1) {
       return res.status(400).json({
         success: false,
-        message: 'Feedback value must be 1 (thumbs up) or -1 (thumbs down)'
+        message: "Feedback value must be 1 (thumbs up) or -1 (thumbs down)",
       });
     }
 
@@ -44,7 +44,7 @@ export const submitFeedback: RequestHandler = async (req: any, res) => {
       if (userFeedbackSet.has(itineraryId)) {
         return res.status(400).json({
           success: false,
-          message: 'You have already provided feedback for this itinerary'
+          message: "You have already provided feedback for this itinerary",
         });
       }
     }
@@ -56,7 +56,7 @@ export const submitFeedback: RequestHandler = async (req: any, res) => {
       userId,
       feedbackValue,
       comment: comment?.trim() || undefined,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     feedbackStorage.set(feedbackId, feedback);
@@ -70,18 +70,18 @@ export const submitFeedback: RequestHandler = async (req: any, res) => {
 
     res.json({
       success: true,
-      message: 'Thank you for your feedback!',
+      message: "Thank you for your feedback!",
       feedback: {
         id: feedback.id,
         feedbackValue: feedback.feedbackValue,
-        timestamp: feedback.timestamp
-      }
+        timestamp: feedback.timestamp,
+      },
     });
   } catch (error) {
-    console.error('Submit feedback error:', error);
+    console.error("Submit feedback error:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to submit feedback'
+      message: "Failed to submit feedback",
     });
   }
 };
@@ -94,12 +94,17 @@ export const getFeedbackStats: RequestHandler = async (req, res) => {
   try {
     const { itineraryId } = req.params;
 
-    const itineraryFeedback = Array.from(feedbackStorage.values())
-      .filter(feedback => feedback.itineraryId === itineraryId);
+    const itineraryFeedback = Array.from(feedbackStorage.values()).filter(
+      (feedback) => feedback.itineraryId === itineraryId,
+    );
 
     const totalFeedback = itineraryFeedback.length;
-    const positiveCount = itineraryFeedback.filter(f => f.feedbackValue === 1).length;
-    const negativeCount = itineraryFeedback.filter(f => f.feedbackValue === -1).length;
+    const positiveCount = itineraryFeedback.filter(
+      (f) => f.feedbackValue === 1,
+    ).length;
+    const negativeCount = itineraryFeedback.filter(
+      (f) => f.feedbackValue === -1,
+    ).length;
     const averageRating = totalFeedback > 0 ? positiveCount / totalFeedback : 0;
 
     res.json({
@@ -112,18 +117,18 @@ export const getFeedbackStats: RequestHandler = async (req, res) => {
         recentFeedback: itineraryFeedback
           .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
           .slice(0, 10)
-          .map(f => ({
+          .map((f) => ({
             feedbackValue: f.feedbackValue,
             comment: f.comment,
-            timestamp: f.timestamp
-          }))
-      }
+            timestamp: f.timestamp,
+          })),
+      },
     });
   } catch (error) {
-    console.error('Get feedback stats error:', error);
+    console.error("Get feedback stats error:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch feedback statistics'
+      message: "Failed to fetch feedback statistics",
     });
   }
 };
@@ -140,7 +145,7 @@ export const checkUserFeedback: RequestHandler = async (req: any, res) => {
     if (!userId) {
       return res.json({
         success: true,
-        hasGivenFeedback: false
+        hasGivenFeedback: false,
       });
     }
 
@@ -149,13 +154,13 @@ export const checkUserFeedback: RequestHandler = async (req: any, res) => {
 
     res.json({
       success: true,
-      hasGivenFeedback
+      hasGivenFeedback,
     });
   } catch (error) {
-    console.error('Check user feedback error:', error);
+    console.error("Check user feedback error:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to check feedback status'
+      message: "Failed to check feedback status",
     });
   }
 };
@@ -169,7 +174,7 @@ export const getAllFeedback: RequestHandler = async (req: any, res) => {
     if (!req.user?.isAdmin) {
       return res.status(403).json({
         success: false,
-        message: 'Admin access required'
+        message: "Admin access required",
       });
     }
 
@@ -180,7 +185,7 @@ export const getAllFeedback: RequestHandler = async (req: any, res) => {
 
     // Filter by itinerary ID if provided
     if (itineraryId) {
-      allFeedback = allFeedback.filter(f => f.itineraryId === itineraryId);
+      allFeedback = allFeedback.filter((f) => f.itineraryId === itineraryId);
     }
 
     // Sort by timestamp (newest first)
@@ -191,33 +196,33 @@ export const getAllFeedback: RequestHandler = async (req: any, res) => {
 
     const stats = {
       totalFeedback: totalCount,
-      positiveCount: allFeedback.filter(f => f.feedbackValue === 1).length,
-      negativeCount: allFeedback.filter(f => f.feedbackValue === -1).length
+      positiveCount: allFeedback.filter((f) => f.feedbackValue === 1).length,
+      negativeCount: allFeedback.filter((f) => f.feedbackValue === -1).length,
     };
 
     res.json({
       success: true,
-      feedback: paginatedFeedback.map(f => ({
+      feedback: paginatedFeedback.map((f) => ({
         id: f.id,
         itineraryId: f.itineraryId,
         userId: f.userId,
         feedbackValue: f.feedbackValue,
         comment: f.comment,
-        timestamp: f.timestamp
+        timestamp: f.timestamp,
       })),
       pagination: {
         page: Number(page),
         limit: Number(limit),
         total: totalCount,
-        pages: Math.ceil(totalCount / Number(limit))
+        pages: Math.ceil(totalCount / Number(limit)),
       },
-      stats
+      stats,
     });
   } catch (error) {
-    console.error('Get all feedback error:', error);
+    console.error("Get all feedback error:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch feedback'
+      message: "Failed to fetch feedback",
     });
   }
 };

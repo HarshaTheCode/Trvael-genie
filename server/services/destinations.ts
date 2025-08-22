@@ -139,6 +139,10 @@ export class DestinationService {
     pathankot: "amritsar",
     srinagar: "leh",
     jammu: "leh",
+<<<<<<< HEAD
+=======
+    
+>>>>>>> refs/remotes/origin/main
     kasol: "shimla",
     spiti: "leh",
     dharamshala: "shimla",

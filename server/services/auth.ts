@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 import { Request, Response, NextFunction } from "express";
+import { SupabaseService } from "./supabase";
 
 const JWT_SECRET =
   process.env.JWT_SECRET || "your-super-secret-jwt-key-change-in-production";
@@ -73,33 +74,36 @@ export class AuthService {
     email: string,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      // Generate or get user
-      let user = usersByEmail.get(email);
+      // Try to get user from Supabase first
+      let user = await SupabaseService.getUserByEmail(email);
+      
       if (!user) {
-        // Create new user
+        // Create new user in Supabase
         const userId = crypto.randomUUID();
-        user = {
+        const newUser = await SupabaseService.createUser({
           id: userId,
           email,
-          emailVerified: false,
           subscriptionTier: "free",
           creditsRemaining: 3,
-          creditsResetDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
           isAdmin: false,
-          createdAt: new Date(),
-        };
-        users.set(userId, user);
-        usersByEmail.set(email, user);
+        });
+        
+        if (!newUser) {
+          throw new Error("Failed to create user in database");
+        }
+        
+        user = newUser;
       }
 
       // Generate magic token
       const magicToken = this.generateMagicToken();
       const expiresAt = new Date(Date.now() + MAGIC_LINK_EXPIRY * 60 * 1000);
 
-      // Store token
-      user.magicToken = magicToken;
-      user.magicTokenExpires = expiresAt;
-      magicTokens.set(magicToken, user.id);
+      // Store token in Supabase
+      const tokenStored = await SupabaseService.storeMagicToken(magicToken, user.id, expiresAt);
+      if (!tokenStored) {
+        throw new Error("Failed to store magic token");
+      }
 
       // Create magic link
       const magicLink = `${process.env.FRONTEND_URL || "http://localhost:8080"}/auth/verify?token=${magicToken}`;
@@ -143,164 +147,204 @@ export class AuthService {
    */
   static async verifyMagicToken(
     token: string,
-  ): Promise<{ success: boolean; jwt?: string; user?: User; message: string }> {
-    const userId = magicTokens.get(token);
-    if (!userId) {
-      return { success: false, message: "Invalid or expired magic link." };
-    }
+  ): Promise<{ success: boolean; jwt?: string; user?: any; message: string }> {
+    try {
+      // Get token from Supabase
+      const tokenData = await SupabaseService.getMagicToken(token);
+      if (!tokenData) {
+        return { success: false, message: "Invalid or expired magic link." };
+      }
 
-    const user = users.get(userId);
-    if (!user || !user.magicToken || user.magicToken !== token) {
-      return { success: false, message: "Invalid magic link." };
-    }
+      // Check if token has expired
+      if (new Date(tokenData.expires_at) < new Date()) {
+        // Clean up expired token
+        await SupabaseService.deleteMagicToken(token);
+        return {
+          success: false,
+          message: "Magic link has expired. Please request a new one.",
+        };
+      }
 
-    if (!user.magicTokenExpires || user.magicTokenExpires < new Date()) {
+      // Get user from Supabase
+      const user = await SupabaseService.getUserById(tokenData.user_id);
+      if (!user) {
+        return { success: false, message: "User not found." };
+      }
+
+      // Mark email as verified and clear magic token
+      await SupabaseService.updateUser(user.id, { email_verified: true });
+      await SupabaseService.deleteMagicToken(token);
+
+      // Generate JWT
+      const jwtToken = this.generateJWT(user.id);
+
       return {
-        success: false,
-        message: "Magic link has expired. Please request a new one.",
+        success: true,
+        jwt: jwtToken,
+        user: { ...user },
+        message: "Successfully signed in!",
       };
+    } catch (error) {
+      console.error("Error verifying magic token:", error);
+      return { success: false, message: "Failed to verify magic link. Please try again." };
     }
-
-    // Mark email as verified and clear magic token
-    user.emailVerified = true;
-    user.magicToken = undefined;
-    user.magicTokenExpires = undefined;
-    magicTokens.delete(token);
-
-    // Generate JWT
-    const jwtToken = this.generateJWT(userId);
-
-    return {
-      success: true,
-      jwt: jwtToken,
-      user: { ...user },
-      message: "Successfully signed in!",
-    };
   }
 
   /**
    * Get user by ID
    */
-  static getUser(userId: string): User | null {
-    return users.get(userId) || null;
+  static async getUser(userId: string): Promise<any | null> {
+    return await SupabaseService.getUserById(userId);
   }
 
   /**
    * Update user subscription
    */
-  static updateUserSubscription(
+  static async updateUserSubscription(
     userId: string,
     tier: "free" | "pro",
     credits?: number,
-  ): boolean {
-    const user = users.get(userId);
-    if (!user) return false;
+  ): Promise<boolean> {
+    try {
+      const updates: any = { subscription_tier: tier };
+      
+      if (credits !== undefined) {
+        updates.credits_remaining = credits;
+      } else if (tier === "pro") {
+        updates.credits_remaining = 100; // Pro users get 100 credits
+      }
 
-    user.subscriptionTier = tier;
-    if (credits !== undefined) {
-      user.creditsRemaining = credits;
+      const result = await SupabaseService.updateUser(userId, updates);
+      return result !== null;
+    } catch (error) {
+      console.error('Error updating user subscription:', error);
+      return false;
     }
-
-    // Pro users get more credits
-    if (tier === "pro" && credits === undefined) {
-      user.creditsRemaining = 100; // Pro users get 100 credits
-    }
-
-    return true;
   }
 
   /**
    * Check and consume user credits
    */
-  static checkAndConsumeCredits(
+  static async checkAndConsumeCredits(
     userId: string,
     amount: number = 1,
-  ): { allowed: boolean; remaining: number } {
-    const user = users.get(userId);
-    if (!user) {
+  ): Promise<{ allowed: boolean; remaining: number }> {
+    try {
+      const user = await SupabaseService.getUserById(userId);
+      if (!user) {
+        return { allowed: false, remaining: 0 };
+      }
+
+      // Reset credits if 24 hours have passed
+      if (new Date(user.credits_reset_date) < new Date()) {
+        const newCredits = user.subscription_tier === "pro" ? 100 : 3;
+        const newResetDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        
+        await SupabaseService.updateUser(userId, {
+          credits_remaining: newCredits,
+          credits_reset_date: newResetDate.toISOString()
+        });
+        
+        user.credits_remaining = newCredits;
+        user.credits_reset_date = newResetDate.toISOString();
+      }
+
+      if (user.credits_remaining < amount) {
+        return { allowed: false, remaining: user.credits_remaining };
+      }
+
+      // Consume credits
+      const newCredits = user.credits_remaining - amount;
+      await SupabaseService.updateUser(userId, { credits_remaining: newCredits });
+      
+      return { allowed: true, remaining: newCredits };
+    } catch (error) {
+      console.error('Error checking/consuming credits:', error);
       return { allowed: false, remaining: 0 };
     }
-
-    // Reset credits if 24 hours have passed
-    if (user.creditsResetDate < new Date()) {
-      user.creditsRemaining = user.subscriptionTier === "pro" ? 100 : 3;
-      user.creditsResetDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    }
-
-    if (user.creditsRemaining < amount) {
-      return { allowed: false, remaining: user.creditsRemaining };
-    }
-
-    user.creditsRemaining -= amount;
-    return { allowed: true, remaining: user.creditsRemaining };
   }
 }
 
 /**
  * Express middleware for JWT authentication
  */
-export const authenticateJWT = (
-  req: Request & { user?: User },
+export const authenticateJWT = async (
+  req: Request & { user?: any },
   res: Response,
   next: NextFunction,
 ) => {
-  const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(" ")[1]; // Bearer TOKEN
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(" ")[1]; // Bearer TOKEN
 
-  if (!token) {
-    return res.status(401).json({ error: "Access token required" });
+    if (!token) {
+      return res.status(401).json({ error: "Access token required" });
+    }
+
+    const userId = AuthService.verifyJWT(token);
+    if (!userId) {
+      return res.status(403).json({ error: "Invalid or expired token" });
+    }
+
+    const user = await AuthService.getUser(userId);
+    if (!user) {
+      return res.status(403).json({ error: "User not found" });
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    console.error('Authentication error:', error);
+    return res.status(500).json({ error: "Authentication failed" });
   }
-
-  const userId = AuthService.verifyJWT(token);
-  if (!userId) {
-    return res.status(403).json({ error: "Invalid or expired token" });
-  }
-
-  const user = AuthService.getUser(userId);
-  if (!user) {
-    return res.status(403).json({ error: "User not found" });
-  }
-
-  req.user = user;
-  next();
-};
+ };
 
 /**
  * Express middleware for optional JWT authentication
  */
-export const optionalAuth = (
-  req: Request & { user?: User },
+export const optionalAuth = async (
+  req: Request & { user?: any },
   res: Response,
   next: NextFunction,
 ) => {
-  const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(" ")[1];
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(" ")[1];
 
-  if (token) {
-    const userId = AuthService.verifyJWT(token);
-    if (userId) {
-      const user = AuthService.getUser(userId);
-      if (user) {
-        req.user = user;
+    if (token) {
+      const userId = AuthService.verifyJWT(token);
+      if (userId) {
+        const user = await AuthService.getUser(userId);
+        if (user) {
+          req.user = user;
+        }
       }
     }
-  }
 
-  next();
+    next();
+  } catch (error) {
+    console.error('Optional auth error:', error);
+    next(); // Continue without authentication
+  }
 };
 
 /**
  * Express middleware for admin authentication
  */
-export const authenticateAdmin = (
-  req: Request & { user?: User },
+export const authenticateAdmin = async (
+  req: Request & { user?: any },
   res: Response,
   next: NextFunction,
 ) => {
-  authenticateJWT(req, res, () => {
-    if (!req.user?.isAdmin) {
-      return res.status(403).json({ error: "Admin access required" });
-    }
-    next();
-  });
+  try {
+    await authenticateJWT(req, res, () => {
+      if (!req.user?.is_admin) {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+      next();
+    });
+  } catch (error) {
+    console.error('Admin authentication error:', error);
+    return res.status(500).json({ error: "Admin authentication failed" });
+  }
 };

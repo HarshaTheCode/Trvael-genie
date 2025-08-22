@@ -1,7 +1,8 @@
-import { RequestHandler } from 'express';
-import { randomUUID } from 'crypto';
-import crypto from 'crypto';
-import { ItineraryResponse, TravelRequest } from '@shared/api';
+import { RequestHandler } from "express";
+import { randomUUID } from "crypto";
+import crypto from "crypto";
+import { ItineraryResponse, TravelRequest } from "@shared/api";
+import { SupabaseService } from "../services/supabase";
 
 // In-memory storage for development (replace with database)
 interface SavedItinerary {
@@ -30,7 +31,7 @@ export const saveItinerary: RequestHandler = async (req: any, res) => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        message: 'Authentication required'
+        message: "Authentication required",
       });
     }
 
@@ -39,7 +40,7 @@ export const saveItinerary: RequestHandler = async (req: any, res) => {
     if (!itineraryData || !originalRequest) {
       return res.status(400).json({
         success: false,
-        message: 'Itinerary data and original request are required'
+        message: "Itinerary data and original request are required",
       });
     }
 
@@ -54,14 +55,14 @@ export const saveItinerary: RequestHandler = async (req: any, res) => {
       favorite: false,
       tags: Array.isArray(tags) ? tags : [],
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     savedItineraries.set(itineraryId, savedItinerary);
 
     res.json({
       success: true,
-      message: 'Trip saved successfully!',
+      message: "Trip saved successfully!",
       itinerary: {
         id: savedItinerary.id,
         title: savedItinerary.title,
@@ -70,14 +71,14 @@ export const saveItinerary: RequestHandler = async (req: any, res) => {
         endDate: originalRequest.endDate,
         createdAt: savedItinerary.createdAt,
         favorite: savedItinerary.favorite,
-        tags: savedItinerary.tags
-      }
+        tags: savedItinerary.tags,
+      },
     });
   } catch (error) {
-    console.error('Save itinerary error:', error);
+    console.error("Save itinerary error:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to save itinerary'
+      message: "Failed to save itinerary",
     });
   }
 };
@@ -91,43 +92,70 @@ export const getUserItineraries: RequestHandler = async (req: any, res) => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        message: 'Authentication required'
+        message: "Authentication required",
       });
     }
 
-    const userItineraries = Array.from(savedItineraries.values())
-      .filter(itinerary => itinerary.userId === req.user.id)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-      .map(itinerary => ({
-        id: itinerary.id,
-        title: itinerary.title,
-        destination: itinerary.originalRequest.destination,
-        startDate: itinerary.originalRequest.startDate,
-        endDate: itinerary.originalRequest.endDate,
-        travelers: itinerary.originalRequest.travelers,
-        budget: itinerary.originalRequest.budget,
-        style: itinerary.originalRequest.style,
-        createdAt: itinerary.createdAt,
-        updatedAt: itinerary.updatedAt,
-        favorite: itinerary.favorite,
-        tags: itinerary.tags,
-        isPublic: itinerary.isPublic,
-        publicShareId: itinerary.publicShareId
-      }));
+    // Try to get from Supabase first
+    let userItineraries = [];
+    
+    try {
+      userItineraries = await SupabaseService.getUserItineraries(req.user.id);
+      
+      // Transform Supabase data to match expected format
+      if (userItineraries.length > 0) {
+        userItineraries = userItineraries.map(item => ({
+          id: item.id,
+          title: item.output_json?.title || `Trip to ${item.input_payload?.destination || 'Unknown'}`,
+          destination: item.input_payload?.destination || 'Unknown',
+          startDate: item.input_payload?.startDate || '',
+          endDate: item.input_payload?.endDate || '',
+          createdAt: new Date(item.created_at),
+          favorite: false, // Default value
+          tags: [], // Default value
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching from Supabase:', error);
+      console.log('Falling back to in-memory storage');
+    }
+    
+    // Fallback to in-memory storage if Supabase failed or returned no results
+    if (userItineraries.length === 0) {
+      userItineraries = Array.from(savedItineraries.values())
+        .filter((itinerary) => itinerary.userId === req.user.id)
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+        .map((itinerary) => ({
+          id: itinerary.id,
+          title: itinerary.title,
+          destination: itinerary.originalRequest.destination,
+          startDate: itinerary.originalRequest.startDate,
+          endDate: itinerary.originalRequest.endDate,
+          travelers: itinerary.originalRequest.travelers,
+          budget: itinerary.originalRequest.budget,
+          style: itinerary.originalRequest.style,
+          createdAt: itinerary.createdAt,
+          updatedAt: itinerary.updatedAt,
+          favorite: itinerary.favorite,
+          tags: itinerary.tags,
+          isPublic: itinerary.isPublic,
+          publicShareId: itinerary.publicShareId,
+        }));
+    }
 
     res.json({
       success: true,
       itineraries: userItineraries,
-      total: userItineraries.length
+      total: userItineraries.length,
     });
   } catch (error) {
-    console.error('Get user itineraries error:', error);
+    console.error("Get user itineraries error:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch itineraries'
+      message: "Failed to fetch itineraries",
     });
   }
-};
+}
 
 /**
  * Get a specific saved itinerary
@@ -141,7 +169,7 @@ export const getSavedItinerary: RequestHandler = async (req: any, res) => {
     if (!itinerary) {
       return res.status(404).json({
         success: false,
-        message: 'Itinerary not found'
+        message: "Itinerary not found",
       });
     }
 
@@ -149,7 +177,7 @@ export const getSavedItinerary: RequestHandler = async (req: any, res) => {
     if (itinerary.userId !== req.user?.id && !itinerary.isPublic) {
       return res.status(403).json({
         success: false,
-        message: 'Access denied'
+        message: "Access denied",
       });
     }
 
@@ -165,14 +193,14 @@ export const getSavedItinerary: RequestHandler = async (req: any, res) => {
         isPublic: itinerary.isPublic,
         publicShareId: itinerary.publicShareId,
         createdAt: itinerary.createdAt,
-        updatedAt: itinerary.updatedAt
-      }
+        updatedAt: itinerary.updatedAt,
+      },
     });
   } catch (error) {
-    console.error('Get saved itinerary error:', error);
+    console.error("Get saved itinerary error:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch itinerary'
+      message: "Failed to fetch itinerary",
     });
   }
 };
@@ -186,7 +214,7 @@ export const generateShareLink: RequestHandler = async (req: any, res) => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        message: 'Authentication required'
+        message: "Authentication required",
       });
     }
 
@@ -196,38 +224,38 @@ export const generateShareLink: RequestHandler = async (req: any, res) => {
     if (!itinerary) {
       return res.status(404).json({
         success: false,
-        message: 'Itinerary not found'
+        message: "Itinerary not found",
       });
     }
 
     if (itinerary.userId !== req.user.id) {
       return res.status(403).json({
         success: false,
-        message: 'Access denied'
+        message: "Access denied",
       });
     }
 
     // Generate public share ID if not exists
     if (!itinerary.publicShareId) {
-      itinerary.publicShareId = crypto.randomBytes(16).toString('hex');
+      itinerary.publicShareId = crypto.randomBytes(16).toString("hex");
       itinerary.isPublic = true;
       itinerary.updatedAt = new Date();
       publicItineraries.set(itinerary.publicShareId, itinerary);
     }
 
-    const shareUrl = `${process.env.FRONTEND_URL || 'http://localhost:8080'}/share/${itinerary.publicShareId}`;
+    const shareUrl = `${process.env.FRONTEND_URL || "http://localhost:8080"}/share/${itinerary.publicShareId}`;
 
     res.json({
       success: true,
-      message: 'Share link generated successfully',
+      message: "Share link generated successfully",
       shareUrl,
-      shareId: itinerary.publicShareId
+      shareId: itinerary.publicShareId,
     });
   } catch (error) {
-    console.error('Generate share link error:', error);
+    console.error("Generate share link error:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to generate share link'
+      message: "Failed to generate share link",
     });
   }
 };
@@ -244,7 +272,7 @@ export const getPublicItinerary: RequestHandler = async (req, res) => {
     if (!itinerary || !itinerary.isPublic) {
       return res.status(404).json({
         success: false,
-        message: 'Shared itinerary not found or no longer public'
+        message: "Shared itinerary not found or no longer public",
       });
     }
 
@@ -259,16 +287,16 @@ export const getPublicItinerary: RequestHandler = async (req, res) => {
           endDate: itinerary.originalRequest.endDate,
           travelers: itinerary.originalRequest.travelers,
           budget: itinerary.originalRequest.budget,
-          style: itinerary.originalRequest.style
+          style: itinerary.originalRequest.style,
         },
-        createdAt: itinerary.createdAt
-      }
+        createdAt: itinerary.createdAt,
+      },
     });
   } catch (error) {
-    console.error('Get public itinerary error:', error);
+    console.error("Get public itinerary error:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch shared itinerary'
+      message: "Failed to fetch shared itinerary",
     });
   }
 };
@@ -282,7 +310,7 @@ export const deleteItinerary: RequestHandler = async (req: any, res) => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        message: 'Authentication required'
+        message: "Authentication required",
       });
     }
 
@@ -292,14 +320,14 @@ export const deleteItinerary: RequestHandler = async (req: any, res) => {
     if (!itinerary) {
       return res.status(404).json({
         success: false,
-        message: 'Itinerary not found'
+        message: "Itinerary not found",
       });
     }
 
     if (itinerary.userId !== req.user.id) {
       return res.status(403).json({
         success: false,
-        message: 'Access denied'
+        message: "Access denied",
       });
     }
 
@@ -312,13 +340,13 @@ export const deleteItinerary: RequestHandler = async (req: any, res) => {
 
     res.json({
       success: true,
-      message: 'Itinerary deleted successfully'
+      message: "Itinerary deleted successfully",
     });
   } catch (error) {
-    console.error('Delete itinerary error:', error);
+    console.error("Delete itinerary error:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to delete itinerary'
+      message: "Failed to delete itinerary",
     });
   }
 };
@@ -332,7 +360,7 @@ export const updateItinerary: RequestHandler = async (req: any, res) => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        message: 'Authentication required'
+        message: "Authentication required",
       });
     }
 
@@ -343,14 +371,14 @@ export const updateItinerary: RequestHandler = async (req: any, res) => {
     if (!itinerary) {
       return res.status(404).json({
         success: false,
-        message: 'Itinerary not found'
+        message: "Itinerary not found",
       });
     }
 
     if (itinerary.userId !== req.user.id) {
       return res.status(403).json({
         success: false,
-        message: 'Access denied'
+        message: "Access denied",
       });
     }
 
@@ -362,20 +390,20 @@ export const updateItinerary: RequestHandler = async (req: any, res) => {
 
     res.json({
       success: true,
-      message: 'Itinerary updated successfully',
+      message: "Itinerary updated successfully",
       itinerary: {
         id: itinerary.id,
         title: itinerary.title,
         favorite: itinerary.favorite,
         tags: itinerary.tags,
-        updatedAt: itinerary.updatedAt
-      }
+        updatedAt: itinerary.updatedAt,
+      },
     });
   } catch (error) {
-    console.error('Update itinerary error:', error);
+    console.error("Update itinerary error:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to update itinerary'
+      message: "Failed to update itinerary",
     });
   }
 };

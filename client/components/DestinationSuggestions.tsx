@@ -1,23 +1,25 @@
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 
 interface DestinationSuggestionsProps {
   onSelect: (destination: string) => void;
 }
 
-export function DestinationSuggestions({ onSelect }: DestinationSuggestionsProps) {
+export function DestinationSuggestions({
+  onSelect,
+}: DestinationSuggestionsProps) {
   const popularDestinations = [
-    { name: 'Hyderabad', short: 'hyd', emoji: '🏰' },
-    { name: 'Mumbai', short: 'mum', emoji: '🌊' },
-    { name: 'Delhi', short: 'del', emoji: '🏛️' },
-    { name: 'Bengaluru', short: 'blr', emoji: '🌆' },
-    { name: 'Jaipur', short: 'jaipur', emoji: '🕌' },
-    { name: 'Goa', short: 'goa', emoji: '🏖️' },
-    { name: 'Chennai', short: 'chennai', emoji: '🏺' },
-    { name: 'Kolkata', short: 'kolkata', emoji: '🎭' },
-    { name: 'Agra', short: 'agra', emoji: '🕌' },
-    { name: 'Varanasi', short: 'varanasi', emoji: '🛕' },
-    { name: 'Udaipur', short: 'udaipur', emoji: '🏰' },
-    { name: 'Kochi', short: 'kochi', emoji: '🚢' }
+    { name: "Hyderabad", short: "hyd", emoji: "🏰" },
+    { name: "Mumbai", short: "mum", emoji: "🌊" },
+    { name: "Delhi", short: "del", emoji: "🏛️" },
+    { name: "Bengaluru", short: "blr", emoji: "🌆" },
+    { name: "Jaipur", short: "jaipur", emoji: "🕌" },
+    { name: "Goa", short: "goa", emoji: "🏖️" },
+    { name: "Chennai", short: "chennai", emoji: "🏺" },
+    { name: "Kolkata", short: "kolkata", emoji: "🎭" },
+    { name: "Agra", short: "agra", emoji: "🕌" },
+    { name: "Varanasi", short: "varanasi", emoji: "🛕" },
+    { name: "Udaipur", short: "udaipur", emoji: "🏰" },
+    { name: "Kochi", short: "kochi", emoji: "🚢" },
   ];
 
   return (

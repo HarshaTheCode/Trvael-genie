@@ -1,12 +1,21 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 
 interface User {
   id: string;
   email: string;
-  subscriptionTier: 'free' | 'pro';
+  subscriptionTier: "free" | "pro";
   creditsRemaining: number;
   isAdmin: boolean;
   emailVerified: boolean;
+  user_metadata?: {
+    [key: string]: any;
+  };
 }
 
 interface AuthContextType {
@@ -14,7 +23,9 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string) => Promise<{ success: boolean; message: string }>;
-  verifyMagicLink: (token: string) => Promise<{ success: boolean; message: string }>;
+  verifyMagicLink: (
+    token: string,
+  ) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
   refreshUser: () => Promise<void>;
   token: string | null;
@@ -35,7 +46,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Initialize auth state from localStorage
   useEffect(() => {
-    const storedToken = localStorage.getItem('auth_token');
+    const storedToken = localStorage.getItem("auth_token");
     if (storedToken) {
       setToken(storedToken);
       fetchCurrentUser(storedToken);
@@ -46,10 +57,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const fetchCurrentUser = async (authToken: string) => {
     try {
-      const response = await fetch('/api/auth/me', {
+      const response = await fetch("/api/auth/me", {
         headers: {
-          'Authorization': `Bearer ${authToken}`
-        }
+          Authorization: `Bearer ${authToken}`,
+        },
       });
 
       if (response.ok) {
@@ -58,54 +69,61 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setUser(data.user);
         } else {
           // Token is invalid, clear it
-          localStorage.removeItem('auth_token');
+          localStorage.removeItem("auth_token");
           setToken(null);
         }
       } else {
         // Token is invalid, clear it
-        localStorage.removeItem('auth_token');
+        localStorage.removeItem("auth_token");
         setToken(null);
       }
     } catch (error) {
-      console.error('Failed to fetch current user:', error);
-      localStorage.removeItem('auth_token');
+      console.error("Failed to fetch current user:", error);
+      localStorage.removeItem("auth_token");
       setToken(null);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const login = async (email: string): Promise<{ success: boolean; message: string }> => {
+  const login = async (
+    email: string,
+  ): Promise<{ success: boolean; message: string }> => {
     try {
-      const response = await fetch('/api/auth/magic-link', {
-        method: 'POST',
+      const response = await fetch("/api/auth/magic-link", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email }),
       });
 
       const data = await response.json();
       return { success: data.success, message: data.message };
     } catch (error) {
-      return { success: false, message: 'Failed to send magic link. Please try again.' };
+      return {
+        success: false,
+        message: "Failed to send magic link. Please try again.",
+      };
     }
   };
 
-  const verifyMagicLink = async (token: string): Promise<{ success: boolean; message: string }> => {
+  const verifyMagicLink = async (
+    token: string,
+  ): Promise<{ success: boolean; message: string }> => {
     try {
-      const response = await fetch('/api/auth/verify', {
-        method: 'POST',
+      const response = await fetch("/api/auth/verify", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ token })
+        body: JSON.stringify({ token }),
       });
 
       const data = await response.json();
-      
+
       if (data.success && data.token) {
-        localStorage.setItem('auth_token', data.token);
+        localStorage.setItem("auth_token", data.token);
         setToken(data.token);
         setUser(data.user);
         return { success: true, message: data.message };
@@ -113,17 +131,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
         return { success: false, message: data.message };
       }
     } catch (error) {
-      return { success: false, message: 'Failed to verify magic link. Please try again.' };
+      return {
+        success: false,
+        message: "Failed to verify magic link. Please try again.",
+      };
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('auth_token');
+    localStorage.removeItem("auth_token");
     setToken(null);
     setUser(null);
-    
+
     // Optional: Call logout endpoint for analytics
-    fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+    fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
   };
 
   const refreshUser = async () => {
@@ -140,20 +161,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
     verifyMagicLink,
     logout,
     refreshUser,
-    token
+    token,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }
@@ -164,17 +181,17 @@ export function useAuthenticatedFetch() {
 
   const authenticatedFetch = async (url: string, options: RequestInit = {}) => {
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      ...((options.headers as Record<string, string>) || {})
+      "Content-Type": "application/json",
+      ...((options.headers as Record<string, string>) || {}),
     };
 
     if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      headers["Authorization"] = `Bearer ${token}`;
     }
 
     return fetch(url, {
       ...options,
-      headers
+      headers,
     });
   };
 

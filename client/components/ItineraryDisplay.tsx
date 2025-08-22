@@ -1,12 +1,36 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Calendar, DollarSign, Save, Share2, ThumbsUp, ThumbsDown, Download, Edit, Copy, Check } from 'lucide-react';
-import { GenerateItineraryResponse, TravelRequest } from '@shared/api';
-import { useAuth, useAuthenticatedFetch } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import {
+  Calendar,
+  DollarSign,
+  Save,
+  Share2,
+  ThumbsUp,
+  ThumbsDown,
+  Download,
+  Edit,
+  Copy,
+  Check,
+} from "lucide-react";
+import { GenerateItineraryResponse, TravelRequest } from "@shared/api";
+import { useAuth, useAuthenticatedFetch } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface ItineraryDisplayProps {
   itinerary: GenerateItineraryResponse;
@@ -15,10 +39,15 @@ interface ItineraryDisplayProps {
   onRegenerate: (newRequest: TravelRequest) => void;
 }
 
-export function ItineraryDisplay({ itinerary, originalRequest, onEdit, onRegenerate }: ItineraryDisplayProps) {
+export function ItineraryDisplay({
+  itinerary,
+  originalRequest,
+  onEdit,
+  onRegenerate,
+}: ItineraryDisplayProps) {
   const { user, isAuthenticated } = useAuth();
   const authenticatedFetch = useAuthenticatedFetch();
-  
+
   const [isSaving, setIsSaving] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
@@ -27,29 +56,29 @@ export function ItineraryDisplay({ itinerary, originalRequest, onEdit, onRegener
 
   const handleSaveTrip = async () => {
     if (!isAuthenticated) {
-      toast.error('Please sign in to save your itinerary');
+      toast.error("Please sign in to save your itinerary");
       return;
     }
 
     setIsSaving(true);
     try {
-      const response = await authenticatedFetch('/api/itineraries', {
-        method: 'POST',
+      const response = await authenticatedFetch("/api/itineraries", {
+        method: "POST",
         body: JSON.stringify({
           itineraryData: itinerary.itinerary,
           originalRequest,
-          title: `Trip to ${originalRequest.destination}`
-        })
+          title: `Trip to ${originalRequest.destination}`,
+        }),
       });
 
       const result = await response.json();
       if (result.success) {
-        toast.success('Trip saved successfully!');
+        toast.success("Trip saved successfully!");
       } else {
-        toast.error(result.message || 'Failed to save trip');
+        toast.error(result.message || "Failed to save trip");
       }
     } catch (error) {
-      toast.error('Failed to save trip. Please try again.');
+      toast.error("Failed to save trip. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -57,20 +86,20 @@ export function ItineraryDisplay({ itinerary, originalRequest, onEdit, onRegener
 
   const handleShare = async () => {
     if (!isAuthenticated) {
-      toast.error('Please sign in to share your itinerary');
+      toast.error("Please sign in to share your itinerary");
       return;
     }
 
     setIsSharing(true);
     try {
       // First save the itinerary, then generate share link
-      const saveResponse = await authenticatedFetch('/api/itineraries', {
-        method: 'POST',
+      const saveResponse = await authenticatedFetch("/api/itineraries", {
+        method: "POST",
         body: JSON.stringify({
           itineraryData: itinerary.itinerary,
           originalRequest,
-          title: `Trip to ${originalRequest.destination}`
-        })
+          title: `Trip to ${originalRequest.destination}`,
+        }),
       });
 
       const saveResult = await saveResponse.json();
@@ -79,19 +108,22 @@ export function ItineraryDisplay({ itinerary, originalRequest, onEdit, onRegener
       }
 
       // Generate share link
-      const shareResponse = await authenticatedFetch(`/api/itineraries/${saveResult.itinerary.id}/share`, {
-        method: 'PATCH'
-      });
+      const shareResponse = await authenticatedFetch(
+        `/api/itineraries/${saveResult.itinerary.id}/share`,
+        {
+          method: "PATCH",
+        },
+      );
 
       const shareResult = await shareResponse.json();
       if (shareResult.success) {
         setShareUrl(shareResult.shareUrl);
-        toast.success('Share link generated!');
+        toast.success("Share link generated!");
       } else {
-        toast.error(shareResult.message || 'Failed to generate share link');
+        toast.error(shareResult.message || "Failed to generate share link");
       }
     } catch (error) {
-      toast.error('Failed to generate share link. Please try again.');
+      toast.error("Failed to generate share link. Please try again.");
     } finally {
       setIsSharing(false);
     }
@@ -101,36 +133,36 @@ export function ItineraryDisplay({ itinerary, originalRequest, onEdit, onRegener
     if (shareUrl) {
       await navigator.clipboard.writeText(shareUrl);
       setIsCopied(true);
-      toast.success('Link copied to clipboard!');
+      toast.success("Link copied to clipboard!");
       setTimeout(() => setIsCopied(false), 2000);
     }
   };
 
   const handleFeedback = async (value: number) => {
     try {
-      const response = await authenticatedFetch('/api/feedback', {
-        method: 'POST',
+      const response = await authenticatedFetch("/api/feedback", {
+        method: "POST",
         body: JSON.stringify({
-          itineraryId: itinerary.itineraryId || 'temp',
-          feedbackValue: value
-        })
+          itineraryId: itinerary.itineraryId || "temp",
+          feedbackValue: value,
+        }),
       });
 
       const result = await response.json();
       if (result.success) {
         setFeedbackGiven(value);
-        toast.success('Thank you for your feedback!');
+        toast.success("Thank you for your feedback!");
       } else {
-        toast.error(result.message || 'Failed to submit feedback');
+        toast.error(result.message || "Failed to submit feedback");
       }
     } catch (error) {
-      toast.error('Failed to submit feedback. Please try again.');
+      toast.error("Failed to submit feedback. Please try again.");
     }
   };
 
   const handleDownloadPDF = () => {
     if (itinerary.itineraryId) {
-      window.open(`/api/pdf/${itinerary.itineraryId}?format=html`, '_blank');
+      window.open(`/api/pdf/${itinerary.itineraryId}?format=html`, "_blank");
     }
   };
 
@@ -146,37 +178,39 @@ export function ItineraryDisplay({ itinerary, originalRequest, onEdit, onRegener
               {itinerary.itinerary.title}
             </h1>
             <p className="text-gray-600">
-              {itinerary.itinerary.meta.destination} • {itinerary.itinerary.meta.start_date} to {itinerary.itinerary.meta.end_date}
+              {itinerary.itinerary.meta.destination} •{" "}
+              {itinerary.itinerary.meta.start_date} to{" "}
+              {itinerary.itinerary.meta.end_date}
             </p>
           </div>
-          
+
           <div className="flex flex-wrap gap-2">
             <Button onClick={onEdit} variant="outline" size="sm">
               <Edit className="h-4 w-4 mr-2" />
               Edit Preferences
             </Button>
-            
-            <Button 
+
+            <Button
               id="save-trip-btn"
-              onClick={handleSaveTrip} 
+              onClick={handleSaveTrip}
               disabled={isSaving}
               size="sm"
               className="bg-green-600 hover:bg-green-700"
             >
               <Save className="h-4 w-4 mr-2" />
-              {isSaving ? 'Saving...' : 'Save Trip'}
+              {isSaving ? "Saving..." : "Save Trip"}
             </Button>
 
             <Dialog>
               <DialogTrigger asChild>
-                <Button 
+                <Button
                   onClick={handleShare}
                   disabled={isSharing}
                   size="sm"
                   variant="outline"
                 >
                   <Share2 className="h-4 w-4 mr-2" />
-                  {isSharing ? 'Sharing...' : 'Share'}
+                  {isSharing ? "Sharing..." : "Share"}
                 </Button>
               </DialogTrigger>
               <DialogContent>
@@ -192,7 +226,11 @@ export function ItineraryDisplay({ itinerary, originalRequest, onEdit, onRegener
                       <div className="flex gap-2">
                         <Input value={shareUrl} readOnly />
                         <Button onClick={handleCopyLink}>
-                          {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                          {isCopied ? (
+                            <Check className="h-4 w-4" />
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )}
                         </Button>
                       </div>
                       <p className="text-sm text-gray-600">
@@ -200,15 +238,19 @@ export function ItineraryDisplay({ itinerary, originalRequest, onEdit, onRegener
                       </p>
                     </div>
                   ) : (
-                    <Button onClick={handleShare} disabled={isSharing} className="w-full">
-                      {isSharing ? 'Generating Link...' : 'Generate Share Link'}
+                    <Button
+                      onClick={handleShare}
+                      disabled={isSharing}
+                      className="w-full"
+                    >
+                      {isSharing ? "Generating Link..." : "Generate Share Link"}
                     </Button>
                   )}
                 </div>
               </DialogContent>
             </Dialog>
 
-            <Button 
+            <Button
               id="download-pdf-btn"
               onClick={handleDownloadPDF}
               size="sm"
@@ -233,21 +275,35 @@ export function ItineraryDisplay({ itinerary, originalRequest, onEdit, onRegener
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {day.segments.map((segment, idx) => (
-                    <div key={idx} className="border-l-2 border-gray-200 pl-4 pb-4">
+                    <div
+                      key={idx}
+                      className="border-l-2 border-gray-200 pl-4 pb-4"
+                    >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-sm font-medium text-orange-600">{segment.time}</span>
-                            <span className="text-sm text-gray-500">({segment.duration_min} min)</span>
+                            <span className="text-sm font-medium text-orange-600">
+                              {segment.time}
+                            </span>
+                            <span className="text-sm text-gray-500">
+                              ({segment.duration_min} min)
+                            </span>
                           </div>
-                          <h4 className="font-semibold text-gray-900">{segment.place}</h4>
-                          <p className="text-sm text-gray-600 mt-1">{segment.note}</p>
+                          <h4 className="font-semibold text-gray-900">
+                            {segment.place}
+                          </h4>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {segment.note}
+                          </p>
                           {segment.food && (
-                            <p className="text-sm text-green-600 mt-1">🍽️ {segment.food}</p>
+                            <p className="text-sm text-green-600 mt-1">
+                              🍽️ {segment.food}
+                            </p>
                           )}
                           {segment.transport_min_to_next > 0 && (
                             <p className="text-xs text-gray-500 mt-2">
-                              🚗 {segment.transport_min_to_next} min to next location
+                              🚗 {segment.transport_min_to_next} min to next
+                              location
                             </p>
                           )}
                         </div>
@@ -255,7 +311,9 @@ export function ItineraryDisplay({ itinerary, originalRequest, onEdit, onRegener
                     </div>
                   ))}
                   <div className="bg-blue-50 rounded-lg p-3 mt-4">
-                    <p className="text-sm font-medium text-blue-800">���� Daily Tip</p>
+                    <p className="text-sm font-medium text-blue-800">
+                      ���� Daily Tip
+                    </p>
                     <p className="text-sm text-blue-700">{day.daily_tip}</p>
                   </div>
                 </CardContent>
@@ -265,7 +323,9 @@ export function ItineraryDisplay({ itinerary, originalRequest, onEdit, onRegener
             {/* Feedback section */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">How was this itinerary?</CardTitle>
+                <CardTitle className="text-lg">
+                  How was this itinerary?
+                </CardTitle>
                 <CardDescription>
                   Your feedback helps us improve our recommendations
                 </CardDescription>
@@ -277,7 +337,11 @@ export function ItineraryDisplay({ itinerary, originalRequest, onEdit, onRegener
                     variant={feedbackGiven === 1 ? "default" : "outline"}
                     onClick={() => handleFeedback(1)}
                     disabled={feedbackGiven !== null}
-                    className={feedbackGiven === 1 ? "bg-green-600 hover:bg-green-700" : ""}
+                    className={
+                      feedbackGiven === 1
+                        ? "bg-green-600 hover:bg-green-700"
+                        : ""
+                    }
                   >
                     <ThumbsUp className="h-4 w-4 mr-2" />
                     Helpful
@@ -287,7 +351,9 @@ export function ItineraryDisplay({ itinerary, originalRequest, onEdit, onRegener
                     variant={feedbackGiven === -1 ? "default" : "outline"}
                     onClick={() => handleFeedback(-1)}
                     disabled={feedbackGiven !== null}
-                    className={feedbackGiven === -1 ? "bg-red-600 hover:bg-red-700" : ""}
+                    className={
+                      feedbackGiven === -1 ? "bg-red-600 hover:bg-red-700" : ""
+                    }
                   >
                     <ThumbsDown className="h-4 w-4 mr-2" />
                     Not Helpful
@@ -315,11 +381,19 @@ export function ItineraryDisplay({ itinerary, originalRequest, onEdit, onRegener
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>Budget Range:</span>
-                    <span className="font-medium">₹{itinerary.itinerary.budget_estimate.low.toLocaleString()} - ₹{itinerary.itinerary.budget_estimate.high.toLocaleString()}</span>
+                    <span className="font-medium">
+                      ₹
+                      {itinerary.itinerary.budget_estimate.low.toLocaleString()}{" "}
+                      - ₹
+                      {itinerary.itinerary.budget_estimate.high.toLocaleString()}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span>Median Estimate:</span>
-                    <span className="font-medium text-green-600">₹{itinerary.itinerary.budget_estimate.median.toLocaleString()}</span>
+                    <span className="font-medium text-green-600">
+                      ₹
+                      {itinerary.itinerary.budget_estimate.median.toLocaleString()}
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -332,33 +406,42 @@ export function ItineraryDisplay({ itinerary, originalRequest, onEdit, onRegener
               <CardContent className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span>Travelers:</span>
-                  <span className="font-medium">{itinerary.itinerary.meta.travelers}</span>
+                  <span className="font-medium">
+                    {itinerary.itinerary.meta.travelers}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Style:</span>
-                  <span className="font-medium capitalize">{itinerary.itinerary.meta.style}</span>
+                  <span className="font-medium capitalize">
+                    {itinerary.itinerary.meta.style}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Budget:</span>
-                  <span className="font-medium capitalize">{itinerary.itinerary.meta.budget}</span>
+                  <span className="font-medium capitalize">
+                    {itinerary.itinerary.meta.budget}
+                  </span>
                 </div>
               </CardContent>
             </Card>
 
-            {itinerary.itinerary.source_facts && itinerary.itinerary.source_facts.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm">Useful Information</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-1 text-xs text-gray-600">
-                    {itinerary.itinerary.source_facts.map((fact, idx) => (
-                      <li key={idx}>• {fact}</li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            )}
+            {itinerary.itinerary.source_facts &&
+              itinerary.itinerary.source_facts.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm">
+                      Useful Information
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-1 text-xs text-gray-600">
+                      {itinerary.itinerary.source_facts.map((fact, idx) => (
+                        <li key={idx}>• {fact}</li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
           </div>
         </div>
       </div>

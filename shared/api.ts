@@ -16,7 +16,17 @@ export interface TravelRequest {
   endDate: string; // YYYY-MM-DD
   travelers: string; // e.g., "2 adults, 1 child"
   budget: "low" | "medium" | "high";
-  style: "culture" | "adventure" | "food" | "relax" | "spiritual" | "photography" | "shopping" | "wildlife" | "wellness" | "nightlife";
+  style:
+    | "culture"
+    | "adventure"
+    | "food"
+    | "relax"
+    | "spiritual"
+    | "photography"
+    | "shopping"
+    | "wildlife"
+    | "wellness"
+    | "nightlife";
   language: "en" | "hi";
   customRequirements?: string; // Additional user preferences
   accessibility?: string; // Accessibility needs
