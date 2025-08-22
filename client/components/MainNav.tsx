@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Icons } from '@/components/ui/Icons';
+import { Icons } from '@/components/ui/icons';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ export function MainNav() {
 
   const navItems = [
     { name: 'Home', href: '/app', icon: Icons.home },
-    { name: 'Plans', href: '/saved-plans', icon: Icons.bookMarked },
+    { name: 'Plans', href: '/saved-plans', icon: Icons.bookmark },
     { name: 'Explore', href: '/explore', icon: Icons.compass },
   ];
 
@@ -20,7 +20,7 @@ export function MainNav() {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center space-x-4 md:space-x-6">
           <Link to="/app" className="flex items-center space-x-2">
-            <Icons.compassIcon className="h-6 w-6 text-primary" />
+            <Icons.compass className="h-6 w-6 text-primary" />
             <span className="text-lg font-bold">TravelBuilder</span>
           </Link>
           <nav className="hidden items-center space-x-4 md:flex">
@@ -76,7 +76,7 @@ export function MobileNav() {
   
   const navItems = [
     { name: 'Home', href: '/app', icon: Icons.home },
-    { name: 'Plans', href: '/saved-plans', icon: Icons.bookMarked },
+    { name: 'Plans', href: '/saved-plans', icon: Icons.bookmark },
     { name: 'Explore', href: '/explore', icon: Icons.compass },
   ];
 

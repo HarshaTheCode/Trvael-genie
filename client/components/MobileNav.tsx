@@ -1,13 +1,13 @@
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Icons } from '@/components/ui/Icons';
+import { Icons } from '@/components/ui/icons';
 
 export function MobileNav() {
   const location = useLocation();
   
   const navItems = [
     { name: 'Home', href: '/app', icon: Icons.home },
-    { name: 'Plans', href: '/saved-plans', icon: Icons.bookMarked },
+    { name: 'Plans', href: '/saved-plans', icon: Icons.bookmark },
     { name: 'Explore', href: '/explore', icon: Icons.compass },
     { name: 'Profile', href: '/profile', icon: Icons.user },
   ];

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Icons } from '@/components/ui/Icons';
+import { Icons } from '@/components/ui/icons';
 
 interface SearchBarProps {
   className?: string;
@@ -49,7 +49,7 @@ export function SearchBar({
             className="absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full"
             onClick={() => setSearchQuery('')}
           >
-            <Icons.x className="h-4 w-4" />
+            <Icons.close className="h-4 w-4" />
             <span className="sr-only">Clear search</span>
           </Button>
         )}
