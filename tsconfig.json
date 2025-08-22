@@ -11,7 +11,8 @@
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
-    "noEmit": true,
+    "noEmit": false,
+    "outDir": "./dist",
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -33,6 +34,7 @@
     }
   },
   "include": [
+    "src/**/*",
     "client/**/*",
     "server/**/*",
     "shared/**/*",
