@@ -81,7 +81,11 @@ export class ValidationService {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      if (startDate < today) {
+      // Normalize startDate to local timezone for comparison
+      const normalizedStartDate = new Date(startDate);
+      normalizedStartDate.setHours(0, 0, 0, 0);
+
+      if (normalizedStartDate < today) {
         errors.push("Start date cannot be in the past");
       }
 
