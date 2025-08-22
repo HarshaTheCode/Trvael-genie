@@ -89,6 +89,7 @@
     "globals": "^15.8.0",
     "input-otp": "^1.2.5",
     "next-themes": "^0.3.0",
+    "portfinder": "^1.0.37",
     "postcss": "^8.4.39",
     "prettier": "^3.3.3",
     "react": "^18.3.1",
