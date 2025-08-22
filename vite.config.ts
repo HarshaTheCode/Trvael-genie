@@ -12,6 +12,13 @@ export default defineConfig(({ mode }) => ({
       allow: ["./client", "./shared"],
       deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**", "server/**"],
     },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   build: {
     outDir: "dist/spa",
@@ -29,24 +36,12 @@ function expressPlugin(): Plugin {
   return {
     name: "express-plugin",
     apply: "serve", // Only apply during development (serve mode)
-    configureServer(server) {
+    buildStart() {
+      // Start Express server on a separate port
       createServer().then(app => {
-        console.log('Express app created and ready');
-
-        // Add Express app as middleware to Vite dev server
-        server.middlewares.use((req, res, next) => {
-          if (req.url?.startsWith('/api')) {
-            console.log(`API request: ${req.method} ${req.url}`);
-            // Call the Express app directly
-            app(req, res, (err: any) => {
-              if (err) {
-                console.error('Express middleware error:', err);
-              }
-              next(err);
-            });
-          } else {
-            next();
-          }
+        const port = 3001;
+        app.listen(port, () => {
+          console.log(`Express API server running on http://localhost:${port}`);
         });
       }).catch(error => {
         console.error('Failed to create server:', error);
