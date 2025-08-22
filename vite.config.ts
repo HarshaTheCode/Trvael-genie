@@ -13,8 +13,8 @@ export default defineConfig(({ mode }) => ({
       deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**", "server/**"],
     },
     proxy: {
-      '/api': {
-        target: 'http://localhost:3001',
+      "/api": {
+        target: "http://localhost:3001",
         changeOrigin: true,
         secure: false,
       },
@@ -38,14 +38,18 @@ function expressPlugin(): Plugin {
     apply: "serve", // Only apply during development (serve mode)
     buildStart() {
       // Start Express server on a separate port
-      createServer().then(app => {
-        const port = 3001;
-        app.listen(port, () => {
-          console.log(`Express API server running on http://localhost:${port}`);
+      createServer()
+        .then((app) => {
+          const port = 3001;
+          app.listen(port, () => {
+            console.log(
+              `Express API server running on http://localhost:${port}`,
+            );
+          });
+        })
+        .catch((error) => {
+          console.error("Failed to create server:", error);
         });
-      }).catch(error => {
-        console.error('Failed to create server:', error);
-      });
     },
   };
 }
