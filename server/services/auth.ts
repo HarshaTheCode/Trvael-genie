@@ -27,7 +27,7 @@ const usersByEmail = new Map<string, User>();
 const magicTokens = new Map<string, string>(); // token -> userId
 
 export class AuthService {
-  private static emailTransporter = nodemailer.createTransporter({
+  private static emailTransporter = nodemailer.createTransport({
     // Configure your email service here
     service: "gmail", // or your preferred service
     auth: {
