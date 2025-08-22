@@ -139,7 +139,6 @@ export class DestinationService {
     pathankot: "amritsar",
     srinagar: "leh",
     jammu: "leh",
-    manali: "shimla",
     kasol: "shimla",
     spiti: "leh",
     dharamshala: "shimla",
