@@ -22,10 +22,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (email: string) => Promise<{ success: boolean; message: string }>;
-  verifyMagicLink: (
-    token: string,
-  ) => Promise<{ success: boolean; message: string }>;
+  setToken: (token: string) => void;
   logout: () => void;
   refreshUser: () => Promise<void>;
   token: string | null;
@@ -39,21 +36,26 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setTokenState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const isAuthenticated = !!user && !!token;
 
-  // Initialize auth state from localStorage
   useEffect(() => {
     const storedToken = localStorage.getItem("auth_token");
     if (storedToken) {
-      setToken(storedToken);
+      setTokenState(storedToken);
       fetchCurrentUser(storedToken);
     } else {
       setIsLoading(false);
     }
   }, []);
+
+  const setToken = (newToken: string) => {
+    setTokenState(newToken);
+    localStorage.setItem("auth_token", newToken);
+    fetchCurrentUser(newToken);
+  };
 
   const fetchCurrentUser = async (authToken: string) => {
     try {
@@ -65,85 +67,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       if (response.ok) {
         const data = await response.json();
-        if (data.success) {
-          setUser(data.user);
-        } else {
-          // Token is invalid, clear it
-          localStorage.removeItem("auth_token");
-          setToken(null);
-        }
+        setUser(data.user);
       } else {
-        // Token is invalid, clear it
-        localStorage.removeItem("auth_token");
-        setToken(null);
+        logout();
       }
     } catch (error) {
       console.error("Failed to fetch current user:", error);
-      localStorage.removeItem("auth_token");
-      setToken(null);
+      logout();
     } finally {
       setIsLoading(false);
     }
   };
 
-  const login = async (
-    email: string,
-  ): Promise<{ success: boolean; message: string }> => {
-    try {
-      const response = await fetch("/api/auth/magic-link", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await response.json();
-      return { success: data.success, message: data.message };
-    } catch (error) {
-      return {
-        success: false,
-        message: "Failed to send magic link. Please try again.",
-      };
-    }
-  };
-
-  const verifyMagicLink = async (
-    token: string,
-  ): Promise<{ success: boolean; message: string }> => {
-    try {
-      const response = await fetch("/api/auth/verify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token }),
-      });
-
-      const data = await response.json();
-
-      if (data.success && data.token) {
-        localStorage.setItem("auth_token", data.token);
-        setToken(data.token);
-        setUser(data.user);
-        return { success: true, message: data.message };
-      } else {
-        return { success: false, message: data.message };
-      }
-    } catch (error) {
-      return {
-        success: false,
-        message: "Failed to verify magic link. Please try again.",
-      };
-    }
-  };
-
   const logout = () => {
     localStorage.removeItem("auth_token");
-    setToken(null);
+    setTokenState(null);
     setUser(null);
-
-    // Optional: Call logout endpoint for analytics
     fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
   };
 
@@ -157,8 +96,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     user,
     isLoading,
     isAuthenticated,
-    login,
-    verifyMagicLink,
+    setToken,
     logout,
     refreshUser,
     token,
@@ -175,7 +113,6 @@ export function useAuth() {
   return context;
 }
 
-// Custom hook for making authenticated API calls
 export function useAuthenticatedFetch() {
   const { token } = useAuth();
 
@@ -198,7 +135,6 @@ export function useAuthenticatedFetch() {
   return authenticatedFetch;
 }
 
-// Higher-order component for protecting routes
 export function withAuth<P extends object>(Component: React.ComponentType<P>) {
   return function AuthenticatedComponent(props: P) {
     const { isAuthenticated, isLoading } = useAuth();

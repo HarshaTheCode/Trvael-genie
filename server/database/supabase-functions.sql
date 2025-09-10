@@ -1,10 +1,11 @@
 -- Function to create users table if it doesn't exist
 CREATE OR REPLACE FUNCTION create_users_table_if_not_exists()
-RETURNS void AS $$
+RETURNS void AS $
 BEGIN
   CREATE TABLE IF NOT EXISTS public.users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email TEXT UNIQUE NOT NULL,
+    password_hash TEXT,
     email_verified BOOLEAN DEFAULT FALSE,
     subscription_tier TEXT DEFAULT 'free' CHECK (subscription_tier IN ('free', 'pro')),
     credits_remaining INTEGER DEFAULT 3,

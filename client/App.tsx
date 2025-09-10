@@ -8,8 +8,11 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import VerifyLogin from "./pages/VerifyLogin";
+import SignUp from "./pages/SignUp";
 import SavedPlans from "./pages/SavedPlans";
 import ShareItinerary from "./pages/ShareItinerary";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import LandingPage from "./pages/LandingPage";
 import { AuthProvider } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
@@ -22,8 +25,10 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+            <Route path="/landing" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
             <Route path="/auth/verify" element={<VerifyLogin />} />
             <Route path="/saved-plans" element={<SavedPlans />} />
             <Route path="/share/:shareId" element={<ShareItinerary />} />

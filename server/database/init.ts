@@ -1,3 +1,5 @@
+import { SupabaseService } from "../services/supabase";
+
 export async function initializeDatabase() {
   try {
     console.log("Initializing database...");
@@ -5,7 +7,7 @@ export async function initializeDatabase() {
     // For development, we're using in-memory storage
     // In production, uncomment the Supabase initialization below
 
-    // await SupabaseService.initializeDatabase();
+    await SupabaseService.initializeDatabase();
 
     console.log(
       "Database initialization completed (using in-memory storage for development)",

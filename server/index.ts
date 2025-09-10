@@ -1,3 +1,12 @@
+import dns from 'dns';
+dns.setDefaultResultOrder('ipv4first');
+
+import fetch from 'node-fetch';
+
+if (!global.fetch) {
+  (global as any).fetch = fetch;
+}
+
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
@@ -16,6 +25,8 @@ import {
   getCurrentUser,
   logout,
   refreshToken,
+  signup,
+  login,
 } from "./routes/auth";
 import {
   saveItinerary,
@@ -58,6 +69,8 @@ export async function createServer() {
   app.get("/api/demo", handleDemo);
 
   // Authentication routes
+  app.post("/api/auth/signup", signup);
+  app.post("/api/auth/login", login);
   app.post("/api/auth/magic-link", sendMagicLink);
   app.post("/api/auth/verify", verifyMagicLink);
   app.get("/api/auth/me", authenticateJWT, getCurrentUser);

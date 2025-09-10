@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,21 +9,33 @@ import { toast } from 'sonner';
 
 export default function SignUp() {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
 
     setIsLoading(true);
     try {
-      const result = await login(email);
-      if (result.success) {
-        toast.success('Check your email for the login link!');
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast.success('Account created successfully! Please log in.');
+        navigate('/login');
       } else {
-        toast.error(result.message || 'Failed to send login link');
+        toast.error(result.error || 'Failed to create account');
       }
     } catch (error) {
       console.error('Sign up error:', error);
@@ -46,7 +57,7 @@ export default function SignUp() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl">Create an account</CardTitle>
-          <CardDescription>Enter your email to create your account</CardDescription>
+          <CardDescription>Enter your email and password to create your account</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="grid gap-4">
@@ -61,36 +72,30 @@ export default function SignUp() {
                 required
               />
             </div>
+            <div className="grid gap-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="confirm-password">Confirm Password</Label>
+              <Input
+                id="confirm-password"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
-              Sign Up with Email
+              Sign Up
             </Button>
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-6">
-              <Button variant="outline" type="button" disabled={isLoading}>
-                {isLoading ? (
-                  <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Icons.gitHub className="mr-2 h-4 w-4" />
-                )}
-                GitHub
-              </Button>
-              <Button variant="outline" type="button" disabled={isLoading}>
-                {isLoading ? (
-                  <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Icons.google className="mr-2 h-4 w-4" />
-                )}
-                Google
-              </Button>
-            </div>
           </CardContent>
         </form>
         <CardFooter className="flex flex-wrap items-center justify-between gap-2">
@@ -100,9 +105,6 @@ export default function SignUp() {
               Sign in
             </Link>
           </div>
-          <Link to="/forgot-password" className="text-sm text-primary underline-offset-4 hover:underline">
-            Forgot password?
-          </Link>
         </CardFooter>
       </Card>
     </div>

@@ -117,8 +117,9 @@ export class SupabaseService {
    * Create new user
    */
   static async createUser(userData: {
-    id: string;
+    id?: string;
     email: string;
+    password_hash?: string;
     subscriptionTier?: string;
     creditsRemaining?: number;
     isAdmin?: boolean;
@@ -127,8 +128,9 @@ export class SupabaseService {
       const { data, error } = await supabase
         .from('users')
         .insert([{
-          id: userData.id,
+          
           email: userData.email,
+          password_hash: userData.password_hash,
           subscription_tier: userData.subscriptionTier || 'free',
           credits_remaining: userData.creditsRemaining || 3,
           credits_reset_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
