@@ -15,7 +15,7 @@ export default function Login() {
   const [searchParams] = useSearchParams();
   const { setToken, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const redirectTo = searchParams.get('redirectTo') || '/';
+  const redirectTo = searchParams.get('redirectTo') || '/index';
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -53,6 +53,13 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
+      <Link
+        to="/"
+        className="absolute left-4 top-4 md:left-8 md:top-8 inline-flex items-center justify-center rounded-lg border border-transparent bg-transparent text-sm font-medium transition-colors hover:bg-muted hover:text-foreground"
+      >
+        <Icons.chevronLeft className="mr-2 h-4 w-4" />
+        Back to home
+      </Link>
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
           <p className="text-muted-foreground">Enter your email and password to sign in</p>

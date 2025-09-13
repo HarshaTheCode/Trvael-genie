@@ -293,8 +293,46 @@ export default function Index() {
                   📄 Export as PDF
                 </Button>
 
-                <Button variant="outline" className="w-full">
-                  💾 Save Itinerary
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  disabled={isSaving || !isAuthenticated}
+                  onClick={async () => {
+                    if (!isAuthenticated) {
+                      toast.error("You must be logged in to save itineraries.");
+                      return;
+                    }
+                    setIsSaving(true);
+                    try {
+                      const response = await authenticatedFetch("/api/itineraries", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          itineraryData: generatedItinerary.itinerary,
+                          originalRequest: formData,
+                          title: generatedItinerary.itinerary.title,
+                        }),
+                      });
+                      const result = await response.json();
+                      if (result.success) {
+                        toast.success("Itinerary saved successfully!");
+                      } else {
+                        toast.error(result.message || "Failed to save itinerary");
+                      }
+                    } catch (err) {
+                      toast.error("Failed to save itinerary. Please try again.");
+                    } finally {
+                      setIsSaving(false);
+                    }
+                  }}
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...
+                    </>
+                  ) : (
+                    "💾 Save Itinerary"
+                  )}
                 </Button>
               </div>
 

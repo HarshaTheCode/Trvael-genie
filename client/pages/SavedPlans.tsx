@@ -151,7 +151,7 @@ function SavedPlans() {
       <header className="border-b bg-white/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2">
+            <Link to="/index" className="flex items-center gap-2">
               <Compass className="h-8 w-8 text-orange-600" />
               <h1 className="text-2xl font-bold text-gray-900">TravelGenie</h1>
             </Link>
@@ -192,7 +192,7 @@ function SavedPlans() {
           </div>
 
           <Button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/index")}
             className="bg-orange-600 hover:bg-orange-700"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -246,7 +246,7 @@ function SavedPlans() {
               access.
             </p>
             <Button
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/index")}
               className="bg-orange-600 hover:bg-orange-700"
             >
               Create Your First Itinerary

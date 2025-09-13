@@ -4,23 +4,7 @@ import crypto from "crypto";
 import { ItineraryResponse, TravelRequest } from "@shared/api";
 import { SupabaseService } from "../services/supabase";
 
-// In-memory storage for development (replace with database)
-interface SavedItinerary {
-  id: string;
-  userId: string;
-  title: string;
-  itineraryData: ItineraryResponse;
-  originalRequest: TravelRequest;
-  publicShareId?: string;
-  isPublic: boolean;
-  favorite: boolean;
-  tags: string[];
-  createdAt: Date;
-  updatedAt: Date;
-}
 
-const savedItineraries = new Map<string, SavedItinerary>();
-const publicItineraries = new Map<string, SavedItinerary>(); // shareId -> itinerary
 
 /**
  * Save an itinerary for authenticated user
@@ -45,33 +29,33 @@ export const saveItinerary: RequestHandler = async (req: any, res) => {
     }
 
     const itineraryId = randomUUID();
-    const savedItinerary: SavedItinerary = {
+    
+    const savedItinerary = await SupabaseService.storeItinerary({
       id: itineraryId,
-      userId: req.user.id,
-      title: title || `Trip to ${originalRequest.destination}`,
-      itineraryData,
-      originalRequest,
-      isPublic: false,
-      favorite: false,
-      tags: Array.isArray(tags) ? tags : [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+      user_id: req.user.id,
+      input_payload: originalRequest,
+      output_json: itineraryData,
+    });
 
-    savedItineraries.set(itineraryId, savedItinerary);
-
+    if (!savedItinerary) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to save itinerary to database",
+      });
+    }
+    
     res.json({
       success: true,
       message: "Trip saved successfully!",
       itinerary: {
         id: savedItinerary.id,
-        title: savedItinerary.title,
+        title: title || `Trip to ${originalRequest.destination}`,
         destination: originalRequest.destination,
         startDate: originalRequest.startDate,
         endDate: originalRequest.endDate,
-        createdAt: savedItinerary.createdAt,
-        favorite: savedItinerary.favorite,
-        tags: savedItinerary.tags,
+        createdAt: savedItinerary.created_at,
+        favorite: false,
+        tags: [],
       },
     });
   } catch (error) {
@@ -96,57 +80,24 @@ export const getUserItineraries: RequestHandler = async (req: any, res) => {
       });
     }
 
-    // Try to get from Supabase first
-    let userItineraries = [];
+    let userItineraries = await SupabaseService.getUserItineraries(req.user.id);
     
-    try {
-      userItineraries = await SupabaseService.getUserItineraries(req.user.id);
-      
-      // Transform Supabase data to match expected format
-      if (userItineraries.length > 0) {
-        userItineraries = userItineraries.map(item => ({
-          id: item.id,
-          title: item.output_json?.title || `Trip to ${item.input_payload?.destination || 'Unknown'}`,
-          destination: item.input_payload?.destination || 'Unknown',
-          startDate: item.input_payload?.startDate || '',
-          endDate: item.input_payload?.endDate || '',
-          createdAt: new Date(item.created_at),
-          favorite: false, // Default value
-          tags: [], // Default value
-        }));
-      }
-    } catch (error) {
-      console.error('Error fetching from Supabase:', error);
-      console.log('Falling back to in-memory storage');
-    }
-    
-    // Fallback to in-memory storage if Supabase failed or returned no results
-    if (userItineraries.length === 0) {
-      userItineraries = Array.from(savedItineraries.values())
-        .filter((itinerary) => itinerary.userId === req.user.id)
-        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-        .map((itinerary) => ({
-          id: itinerary.id,
-          title: itinerary.title,
-          destination: itinerary.originalRequest.destination,
-          startDate: itinerary.originalRequest.startDate,
-          endDate: itinerary.originalRequest.endDate,
-          travelers: itinerary.originalRequest.travelers,
-          budget: itinerary.originalRequest.budget,
-          style: itinerary.originalRequest.style,
-          createdAt: itinerary.createdAt,
-          updatedAt: itinerary.updatedAt,
-          favorite: itinerary.favorite,
-          tags: itinerary.tags,
-          isPublic: itinerary.isPublic,
-          publicShareId: itinerary.publicShareId,
-        }));
-    }
+    // Transform Supabase data to match expected format
+    const formattedItineraries = userItineraries.map(item => ({
+      id: item.id,
+      title: item.output_json?.title || `Trip to ${item.input_payload?.destination || 'Unknown'}`,
+      destination: item.input_payload?.destination || 'Unknown',
+      startDate: item.input_payload?.startDate || '',
+      endDate: item.input_payload?.endDate || '',
+      createdAt: new Date(item.created_at),
+      favorite: false, // Default value, you might want to store this in the DB
+      tags: [], // Default value, you might want to store this in the DB
+    }));
 
     res.json({
       success: true,
-      itineraries: userItineraries,
-      total: userItineraries.length,
+      itineraries: formattedItineraries,
+      total: formattedItineraries.length,
     });
   } catch (error) {
     console.error("Get user itineraries error:", error);
@@ -164,7 +115,7 @@ export const getUserItineraries: RequestHandler = async (req: any, res) => {
 export const getSavedItinerary: RequestHandler = async (req: any, res) => {
   try {
     const { id } = req.params;
-    const itinerary = savedItineraries.get(id);
+    const itinerary = await SupabaseService.getItineraryById(id);
 
     if (!itinerary) {
       return res.status(404).json({
@@ -174,7 +125,7 @@ export const getSavedItinerary: RequestHandler = async (req: any, res) => {
     }
 
     // Check if user owns this itinerary or if it's public
-    if (itinerary.userId !== req.user?.id && !itinerary.isPublic) {
+    if (itinerary.user_id !== req.user?.id && !itinerary.is_public) {
       return res.status(403).json({
         success: false,
         message: "Access denied",
@@ -185,15 +136,15 @@ export const getSavedItinerary: RequestHandler = async (req: any, res) => {
       success: true,
       itinerary: {
         id: itinerary.id,
-        title: itinerary.title,
-        itineraryData: itinerary.itineraryData,
-        originalRequest: itinerary.originalRequest,
-        favorite: itinerary.favorite,
-        tags: itinerary.tags,
-        isPublic: itinerary.isPublic,
-        publicShareId: itinerary.publicShareId,
-        createdAt: itinerary.createdAt,
-        updatedAt: itinerary.updatedAt,
+        title: itinerary.output_json?.title || `Trip to ${itinerary.input_payload?.destination}`,
+        itineraryData: itinerary.output_json,
+        originalRequest: itinerary.input_payload,
+        favorite: false, // Add to DB later
+        tags: [], // Add to DB later
+        isPublic: itinerary.is_public,
+        publicShareId: itinerary.public_share_id,
+        createdAt: itinerary.created_at,
+        updatedAt: itinerary.updated_at,
       },
     });
   } catch (error) {
@@ -219,7 +170,7 @@ export const generateShareLink: RequestHandler = async (req: any, res) => {
     }
 
     const { id } = req.params;
-    const itinerary = savedItineraries.get(id);
+    const itinerary = await SupabaseService.getItineraryById(id);
 
     if (!itinerary) {
       return res.status(404).json({
@@ -228,28 +179,34 @@ export const generateShareLink: RequestHandler = async (req: any, res) => {
       });
     }
 
-    if (itinerary.userId !== req.user.id) {
+    if (itinerary.user_id !== req.user.id) {
       return res.status(403).json({
         success: false,
         message: "Access denied",
       });
     }
 
-    // Generate public share ID if not exists
-    if (!itinerary.publicShareId) {
-      itinerary.publicShareId = crypto.randomBytes(16).toString("hex");
-      itinerary.isPublic = true;
-      itinerary.updatedAt = new Date();
-      publicItineraries.set(itinerary.publicShareId, itinerary);
+    let shareId = itinerary.public_share_id;
+    if (!shareId) {
+      shareId = crypto.randomBytes(16).toString("hex");
+      const updated = await SupabaseService.updateItinerary(id, {
+        public_share_id: shareId,
+        is_public: true,
+        updated_at: new Date().toISOString(),
+      });
+
+      if (!updated) {
+        return res.status(500).json({ success: false, message: "Failed to create share link" });
+      }
     }
 
-    const shareUrl = `${process.env.FRONTEND_URL || "http://localhost:8080"}/share/${itinerary.publicShareId}`;
+    const shareUrl = `${process.env.FRONTEND_URL || "http://localhost:8080"}/share/${shareId}`;
 
     res.json({
       success: true,
       message: "Share link generated successfully",
       shareUrl,
-      shareId: itinerary.publicShareId,
+      shareId,
     });
   } catch (error) {
     console.error("Generate share link error:", error);
@@ -267,9 +224,9 @@ export const generateShareLink: RequestHandler = async (req: any, res) => {
 export const getPublicItinerary: RequestHandler = async (req, res) => {
   try {
     const { shareId } = req.params;
-    const itinerary = publicItineraries.get(shareId);
+    const itinerary = await SupabaseService.getItineraryByShareId(shareId);
 
-    if (!itinerary || !itinerary.isPublic) {
+    if (!itinerary || !itinerary.is_public) {
       return res.status(404).json({
         success: false,
         message: "Shared itinerary not found or no longer public",
@@ -279,17 +236,17 @@ export const getPublicItinerary: RequestHandler = async (req, res) => {
     res.json({
       success: true,
       itinerary: {
-        title: itinerary.title,
-        itineraryData: itinerary.itineraryData,
+        title: itinerary.output_json.title,
+        itineraryData: itinerary.output_json,
         originalRequest: {
-          destination: itinerary.originalRequest.destination,
-          startDate: itinerary.originalRequest.startDate,
-          endDate: itinerary.originalRequest.endDate,
-          travelers: itinerary.originalRequest.travelers,
-          budget: itinerary.originalRequest.budget,
-          style: itinerary.originalRequest.style,
+          destination: itinerary.input_payload.destination,
+          startDate: itinerary.input_payload.startDate,
+          endDate: itinerary.input_payload.endDate,
+          travelers: itinerary.input_payload.travelers,
+          budget: itinerary.input_payload.budget,
+          style: itinerary.input_payload.style,
         },
-        createdAt: itinerary.createdAt,
+        createdAt: itinerary.created_at,
       },
     });
   } catch (error) {
@@ -315,7 +272,7 @@ export const deleteItinerary: RequestHandler = async (req: any, res) => {
     }
 
     const { id } = req.params;
-    const itinerary = savedItineraries.get(id);
+    const itinerary = await SupabaseService.getItineraryById(id);
 
     if (!itinerary) {
       return res.status(404).json({
@@ -324,19 +281,21 @@ export const deleteItinerary: RequestHandler = async (req: any, res) => {
       });
     }
 
-    if (itinerary.userId !== req.user.id) {
+    if (itinerary.user_id !== req.user.id) {
       return res.status(403).json({
         success: false,
         message: "Access denied",
       });
     }
 
-    // Remove from public share if exists
-    if (itinerary.publicShareId) {
-      publicItineraries.delete(itinerary.publicShareId);
-    }
+    const success = await SupabaseService.deleteItinerary(id);
 
-    savedItineraries.delete(id);
+    if (!success) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to delete itinerary from database",
+      });
+    }
 
     res.json({
       success: true,
@@ -366,7 +325,8 @@ export const updateItinerary: RequestHandler = async (req: any, res) => {
 
     const { id } = req.params;
     const { title, favorite, tags } = req.body;
-    const itinerary = savedItineraries.get(id);
+    
+    const itinerary = await SupabaseService.getItineraryById(id);
 
     if (!itinerary) {
       return res.status(404).json({
@@ -375,28 +335,48 @@ export const updateItinerary: RequestHandler = async (req: any, res) => {
       });
     }
 
-    if (itinerary.userId !== req.user.id) {
+    if (itinerary.user_id !== req.user.id) {
       return res.status(403).json({
         success: false,
         message: "Access denied",
       });
     }
 
-    // Update fields
-    if (title !== undefined) itinerary.title = title;
-    if (favorite !== undefined) itinerary.favorite = favorite;
-    if (tags !== undefined) itinerary.tags = Array.isArray(tags) ? tags : [];
-    itinerary.updatedAt = new Date();
+    // Prepare updates
+    const updates: any = {};
+    if (title !== undefined) {
+      // We need to update the JSON blob
+      const newOutputJson = { ...itinerary.output_json, title };
+      updates.output_json = newOutputJson;
+    }
+    // TODO: Add favorite and tags to the database schema
+    // if (favorite !== undefined) updates.favorite = favorite;
+    // if (tags !== undefined) updates.tags = tags;
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ success: false, message: "No updates provided" });
+    }
+
+    updates.updated_at = new Date().toISOString();
+
+    const updatedItinerary = await SupabaseService.updateItinerary(id, updates);
+
+    if (!updatedItinerary) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to update itinerary",
+      });
+    }
 
     res.json({
       success: true,
       message: "Itinerary updated successfully",
       itinerary: {
-        id: itinerary.id,
-        title: itinerary.title,
-        favorite: itinerary.favorite,
-        tags: itinerary.tags,
-        updatedAt: itinerary.updatedAt,
+        id: updatedItinerary.id,
+        title: updatedItinerary.output_json.title,
+        // favorite: updatedItinerary.favorite,
+        // tags: updatedItinerary.tags,
+        updatedAt: updatedItinerary.updated_at,
       },
     });
   } catch (error) {

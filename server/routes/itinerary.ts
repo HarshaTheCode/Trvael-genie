@@ -219,7 +219,12 @@ export const exportItinerary: RequestHandler = async (req, res) => {
       });
     }
 
-    const storedItinerary = itineraries.get(itineraryId);
+    // Try in-memory first
+    let storedItinerary = itineraries.get(itineraryId);
+    // If not found, try Supabase
+    if (!storedItinerary) {
+      storedItinerary = await SupabaseService.getItineraryById(itineraryId);
+    }
     if (!storedItinerary) {
       return res.status(404).json({
         success: false,
@@ -227,14 +232,10 @@ export const exportItinerary: RequestHandler = async (req, res) => {
       });
     }
 
-    // For MVP, we'll return a placeholder PDF URL
-    // In production, implement actual PDF generation service
     const pdfUrl = `/api/pdf/${itineraryId}`;
-
     const response: ExportResponse = {
       pdfUrl: pdfUrl,
     };
-
     res.json(response);
   } catch (error) {
     console.error("Export itinerary error:", error);
@@ -287,18 +288,23 @@ export const generatePDF: RequestHandler = async (req, res) => {
     const { id } = req.params;
     const { format = "html" } = req.query; // 'html' or 'text'
 
-    const storedItinerary = itineraries.get(id);
+    // Try in-memory first
+    let storedItinerary = itineraries.get(id);
+    // If not found, try Supabase
+    if (!storedItinerary) {
+      storedItinerary = await SupabaseService.getItineraryById(id);
+    }
     if (!storedItinerary) {
       return res.status(404).json({ error: "Itinerary not found" });
     }
 
-    const itinerary = storedItinerary.output_json;
+    // Support both in-memory and Supabase formats
+    const itinerary = storedItinerary.output_json || storedItinerary;
 
     if (format === "html") {
       // Return HTML for PDF generation (can be used with puppeteer)
       const htmlContent = PDFExportService.generateHTML(itinerary);
       const filename = PDFExportService.getFilename(itinerary);
-
       res.setHeader("Content-Type", "text/html");
       res.setHeader(
         "Content-Disposition",
@@ -309,7 +315,6 @@ export const generatePDF: RequestHandler = async (req, res) => {
       // Return professionally formatted text
       const pdfContent = PDFExportService.generateProfessionalPDF(itinerary);
       const filename = PDFExportService.getFilename(itinerary);
-
       res.setHeader("Content-Type", "text/plain; charset=utf-8");
       res.setHeader(
         "Content-Disposition",

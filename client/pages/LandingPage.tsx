@@ -55,7 +55,7 @@ export default function LandingPage() {
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             <Button size="lg" className="px-8 py-6 text-lg" asChild>
-              <Link to="/login">
+              <Link to="/signup">
                 Get Started <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>

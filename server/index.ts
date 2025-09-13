@@ -14,7 +14,6 @@ import { handleDemo } from "./routes/demo";
 import { initializeDatabase } from "./database/init";
 import {
   generateItinerary,
-  getItinerary,
   exportItinerary,
   saveEmail,
   generatePDF,
@@ -79,7 +78,7 @@ export async function createServer() {
 
   // Travel Itinerary API routes (with optional auth for anonymous usage)
   app.post("/api/generate-itinerary", optionalAuth, generateItinerary);
-  app.get("/api/itineraries/:id", optionalAuth, getItinerary);
+  
   app.post("/api/export", exportItinerary);
   app.post("/api/save-email", saveEmail);
   app.get("/api/pdf/:id", generatePDF);
@@ -87,7 +86,7 @@ export async function createServer() {
   // Saved Itineraries routes (require authentication)
   app.post("/api/itineraries", authenticateJWT, saveItinerary);
   app.get("/api/itineraries", authenticateJWT, getUserItineraries);
-  app.get("/api/itineraries/:id", optionalAuth, getSavedItinerary);
+  app.get("/api/itineraries/:id", authenticateJWT, getSavedItinerary);
   app.patch("/api/itineraries/:id/share", authenticateJWT, generateShareLink);
   app.patch("/api/itineraries/:id", authenticateJWT, updateItinerary);
   app.delete("/api/itineraries/:id", authenticateJWT, deleteItinerary);

@@ -14,6 +14,7 @@ import ShareItinerary from "./pages/ShareItinerary";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
 import { AuthProvider } from "./contexts/AuthContext";
+import ViewItinerary from "./pages/ViewItinerary";
 
 const queryClient = new QueryClient();
 
@@ -25,12 +26,15 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-            <Route path="/landing" element={<LandingPage />} />
+             <Route path="/" element={<LandingPage />} />
+
+            <Route path="/index" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/auth/verify" element={<VerifyLogin />} />
-            <Route path="/saved-plans" element={<SavedPlans />} />
+            <Route path="/saved-plans" element={<ProtectedRoute><SavedPlans /></ProtectedRoute>} />
+            <Route path="/itinerary/:id" element={<ProtectedRoute><ViewItinerary /></ProtectedRoute>} />
             <Route path="/share/:shareId" element={<ShareItinerary />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

@@ -307,6 +307,29 @@ export class SupabaseService {
   }
 
   /**
+   * Get itinerary by Share ID
+   */
+  static async getItineraryByShareId(shareId: string) {
+    try {
+      const { data, error } = await supabase
+        .from('itineraries')
+        .select('*')
+        .eq('public_share_id', shareId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching itinerary by shareId:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in getItineraryByShareId:', error);
+      return null;
+    }
+  }
+
+  /**
    * Get user itineraries
    */
   static async getUserItineraries(userId: string) {
