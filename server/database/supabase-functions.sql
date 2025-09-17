@@ -1,3 +1,10 @@
+CREATE OR REPLACE FUNCTION exec_sql(sql TEXT)
+RETURNS void AS $
+BEGIN
+  EXECUTE sql;
+END;
+$ LANGUAGE plpgsql;
+
 -- Function to create users table if it doesn't exist
 CREATE OR REPLACE FUNCTION create_users_table_if_not_exists()
 RETURNS void AS $
@@ -67,14 +74,33 @@ BEGIN
   BEGIN
     DELETE FROM public.magic_tokens WHERE expires_at < NOW();
   END;
-  $$ LANGUAGE plpgsql;
+  $ LANGUAGE plpgsql;
 END;
-$$ LANGUAGE plpgsql;
+$ LANGUAGE plpgsql;
+
+-- Function to create search_history table if it doesn't exist
+CREATE OR REPLACE FUNCTION create_search_history_table_if_not_exists()
+RETURNS void AS $
+BEGIN
+  CREATE TABLE IF NOT EXISTS public.search_history (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+    itinerary_data JSONB NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  );
+
+  -- Create indexes for better performance
+  CREATE INDEX IF NOT EXISTS idx_search_history_user_id ON public.search_history(user_id);
+  CREATE INDEX IF NOT EXISTS idx_search_history_created_at ON public.search_history(created_at);
+END;
+$ LANGUAGE plpgsql;
 
 -- Enable Row Level Security (RLS)
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.itineraries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.magic_tokens ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.search_history ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for users table
 CREATE POLICY "Users can view their own data" ON public.users
@@ -102,6 +128,16 @@ CREATE POLICY "Users can delete their own itineraries" ON public.itineraries
 -- RLS Policies for magic_tokens table
 CREATE POLICY "Users can manage their own magic tokens" ON public.magic_tokens
   FOR ALL USING (auth.uid()::text = user_id::text);
+
+-- RLS Policies for search_history table
+CREATE POLICY "Users can view their own search history" ON public.search_history
+  FOR SELECT USING (auth.uid()::text = user_id::text);
+
+CREATE POLICY "Users can insert their own search history" ON public.search_history
+  FOR INSERT WITH CHECK (auth.uid()::text = user_id::text);
+
+CREATE POLICY "Users can delete their own search history" ON public.search_history
+  FOR DELETE USING (auth.uid()::text = user_id::text);
 
 -- Create a scheduled job to clean up expired tokens (runs every hour)
 SELECT cron.schedule(

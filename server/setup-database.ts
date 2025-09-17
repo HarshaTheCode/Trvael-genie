@@ -1,6 +1,10 @@
 import { supabase } from './services/supabase';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function setupDatabase() {
   console.log('Setting up Supabase database tables...');
@@ -61,6 +65,19 @@ async function setupDatabase() {
       `;
       const { error: tokensError } = await supabase.rpc('exec_sql', { sql: createTokensQuery });
       console.log(tokensError ? 'Failed to create magic_tokens table' : 'Magic tokens table created successfully');
+
+      // Create search_history table directly
+      const createHistoryQuery = `
+        CREATE TABLE IF NOT EXISTS public.search_history (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+          itinerary_data JSONB NOT NULL,
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+          updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        );
+      `;
+      const { error: historyError } = await supabase.rpc('exec_sql', { sql: createHistoryQuery });
+      console.log(historyError ? 'Failed to create search_history table' : 'Search history table created successfully');
     } else {
       console.log('Database setup completed successfully');
     }

@@ -1,9 +1,10 @@
 import "./global.css";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+// Removed Toaster, Sonner, and TooltipProvider from shadcn/ui. Use standard HTML elements or remove if not needed.
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "./components/ui/toaster";
+import { Toaster as SonnerShim } from "./components/ui/sonner";
+import { Toaster as SonnerToaster } from 'sonner';
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
@@ -20,28 +21,29 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-             <Route path="/" element={<LandingPage />} />
+    <AuthProvider>
+  <Toaster />
+  {/* Mount the real Sonner Toaster so existing `toast` calls (from 'sonner') display */}
+  <SonnerToaster />
+  {/* Keep local Sonner shim mounted for preview builds if needed */}
+  <SonnerShim />
+      <BrowserRouter>
+        <Routes>
+           <Route path="/" element={<LandingPage />} />
 
-            <Route path="/index" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+          <Route path="/index" element={<ProtectedRoute><Index /></ProtectedRoute>} />
 
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/auth/verify" element={<VerifyLogin />} />
-            <Route path="/saved-plans" element={<ProtectedRoute><SavedPlans /></ProtectedRoute>} />
-            <Route path="/itinerary/:id" element={<ProtectedRoute><ViewItinerary /></ProtectedRoute>} />
-            <Route path="/share/:shareId" element={<ShareItinerary />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </TooltipProvider>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/auth/verify" element={<VerifyLogin />} />
+          <Route path="/saved-plans" element={<ProtectedRoute><SavedPlans /></ProtectedRoute>} />
+          <Route path="/itinerary/:id" element={<ProtectedRoute><ViewItinerary /></ProtectedRoute>} />
+          <Route path="/share/:shareId" element={<ShareItinerary />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

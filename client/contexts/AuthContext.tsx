@@ -23,6 +23,7 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   setToken: (token: string) => void;
+  verifyMagicLink?: (token: string) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
   refreshUser: () => Promise<void>;
   token: string | null;
@@ -97,6 +98,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     isLoading,
     isAuthenticated,
     setToken,
+    verifyMagicLink: async (token: string) => {
+      try {
+        const res = await fetch(`/api/auth/verify?token=${encodeURIComponent(token)}`);
+        const data = await res.json().catch(() => ({}));
+        return { success: res.ok, message: data?.message };
+      } catch (err) {
+        return { success: false, message: 'Verification failed' };
+      }
+    },
     logout,
     refreshUser,
     token,

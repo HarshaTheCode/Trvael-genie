@@ -45,3 +45,15 @@ CREATE INDEX IF NOT EXISTS idx_itineraries_user_id ON itineraries(user_id);
 CREATE INDEX IF NOT EXISTS idx_itineraries_cached_key ON itineraries(cached_key);
 CREATE INDEX IF NOT EXISTS idx_rate_limits_user_ip ON rate_limits(user_id_or_ip);
 CREATE INDEX IF NOT EXISTS idx_destinations_city_state ON destinations(city, state);
+
+-- Search History table
+CREATE TABLE IF NOT EXISTS search_history (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    itinerary_data JSONB NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_search_history_user_id ON search_history(user_id);
+

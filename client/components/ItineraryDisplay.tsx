@@ -1,33 +1,5 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import {
-  Calendar,
-  DollarSign,
-  Save,
-  Share2,
-  ThumbsUp,
-  ThumbsDown,
-  Download,
-  Edit,
-  Copy,
-  Check,
-} from "lucide-react";
+// Removed shadcn/ui and lucide-react imports. Use standard HTML elements and emojis instead.
 import { GenerateItineraryResponse, TravelRequest } from "@shared/api";
 import { useAuth, useAuthenticatedFetch } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -185,80 +157,46 @@ export function ItineraryDisplay({
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Button onClick={onEdit} variant="outline" size="sm">
-              <Edit className="h-4 w-4 mr-2" />
+            <button onClick={onEdit} className="border rounded px-3 py-1 text-sm flex items-center mr-2">
+              <span className="mr-2">✏️</span>
               Edit Preferences
-            </Button>
+            </button>
 
-            <Button
+            <button
               id="save-trip-btn"
               onClick={handleSaveTrip}
               disabled={isSaving}
-              size="sm"
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-green-600 hover:bg-green-700 text-white rounded px-3 py-1 text-sm flex items-center mr-2"
             >
-              <Save className="h-4 w-4 mr-2" />
+              <span className="mr-2">💾</span>
               {isSaving ? "Saving..." : "Save Trip"}
-            </Button>
+            </button>
 
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  onClick={handleShare}
-                  disabled={isSharing}
-                  size="sm"
-                  variant="outline"
-                >
-                  <Share2 className="h-4 w-4 mr-2" />
-                  {isSharing ? "Sharing..." : "Share"}
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Share Your Itinerary</DialogTitle>
-                  <DialogDescription>
-                    Share this itinerary with friends and family
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  {shareUrl ? (
-                    <div className="space-y-3">
-                      <div className="flex gap-2">
-                        <Input value={shareUrl} readOnly />
-                        <Button onClick={handleCopyLink}>
-                          {isCopied ? (
-                            <Check className="h-4 w-4" />
-                          ) : (
-                            <Copy className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        Anyone with this link can view your itinerary
-                      </p>
-                    </div>
-                  ) : (
-                    <Button
-                      onClick={handleShare}
-                      disabled={isSharing}
-                      className="w-full"
-                    >
-                      {isSharing ? "Generating Link..." : "Generate Share Link"}
-                    </Button>
-                  )}
-                </div>
-              </DialogContent>
-            </Dialog>
+            <button
+              onClick={handleShare}
+              disabled={isSharing}
+              className="border rounded px-3 py-1 text-sm flex items-center mr-2"
+            >
+              <span className="mr-2">🔗</span>
+              {isSharing ? "Sharing..." : "Share"}
+            </button>
+            {shareUrl && (
+              <div className="flex gap-2 mt-2">
+                <input value={shareUrl} readOnly className="border px-2 py-1 rounded text-sm flex-1" />
+                <button onClick={handleCopyLink} className="border rounded px-2 py-1 text-sm">
+                  {isCopied ? "✅" : "📋"}
+                </button>
+              </div>
+            )}
 
-            <Button
+            <button
               id="download-pdf-btn"
               onClick={handleDownloadPDF}
-              size="sm"
-              variant="outline"
+              className="border rounded px-3 py-1 text-sm flex items-center"
             >
-              <Download className="h-4 w-4 mr-2" />
+              <span className="mr-2">⬇️</span>
               Download as PDF
-            </Button>
+            </button>
           </div>
         </div>
 
@@ -266,14 +204,12 @@ export function ItineraryDisplay({
           {/* Main itinerary content */}
           <div className="lg:col-span-2 space-y-6">
             {itinerary.itinerary.days.map((day) => (
-              <Card key={day.day} className="border-l-4 border-l-orange-500">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-orange-600" />
-                    Day {day.day} - {day.date}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
+              <div key={day.day} className="border-l-4 border-l-orange-500 bg-white rounded-lg mb-6">
+                <div className="flex items-center gap-2 px-4 py-2 border-b">
+                  <span className="text-orange-600">📅</span>
+                  <span className="font-bold">Day {day.day} - {day.date}</span>
+                </div>
+                <div className="p-4 space-y-4">
                   {day.segments.map((segment, idx) => (
                     <div
                       key={idx}
@@ -312,98 +248,76 @@ export function ItineraryDisplay({
                   ))}
                   <div className="bg-blue-50 rounded-lg p-3 mt-4">
                     <p className="text-sm font-medium text-blue-800">
-                      ���� Daily Tip
+                      💡 Daily Tip
                     </p>
                     <p className="text-sm text-blue-700">{day.daily_tip}</p>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
 
             {/* Feedback section */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">
-                  How was this itinerary?
-                </CardTitle>
-                <CardDescription>
-                  Your feedback helps us improve our recommendations
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-4 items-center">
-                  <Button
-                    id="feedback-up-btn"
-                    variant={feedbackGiven === 1 ? "default" : "outline"}
-                    onClick={() => handleFeedback(1)}
-                    disabled={feedbackGiven !== null}
-                    className={
-                      feedbackGiven === 1
-                        ? "bg-green-600 hover:bg-green-700"
-                        : ""
-                    }
-                  >
-                    <ThumbsUp className="h-4 w-4 mr-2" />
-                    Helpful
-                  </Button>
-                  <Button
-                    id="feedback-down-btn"
-                    variant={feedbackGiven === -1 ? "default" : "outline"}
-                    onClick={() => handleFeedback(-1)}
-                    disabled={feedbackGiven !== null}
-                    className={
-                      feedbackGiven === -1 ? "bg-red-600 hover:bg-red-700" : ""
-                    }
-                  >
-                    <ThumbsDown className="h-4 w-4 mr-2" />
-                    Not Helpful
-                  </Button>
-                  {feedbackGiven && (
-                    <span className="text-sm text-gray-600">
-                      Thank you for your feedback!
-                    </span>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+            <div className="bg-white rounded-lg p-4 mt-6">
+              <div className="text-lg font-bold mb-2">How was this itinerary?</div>
+              <div className="text-gray-600 mb-2 text-sm">Your feedback helps us improve our recommendations</div>
+              <div className="flex gap-4 items-center">
+                <button
+                  id="feedback-up-btn"
+                  onClick={() => handleFeedback(1)}
+                  disabled={feedbackGiven !== null}
+                  className={`border rounded px-3 py-1 text-sm flex items-center ${feedbackGiven === 1 ? "bg-green-600 text-white" : ""}`}
+                >
+                  <span className="mr-2">👍</span>
+                  Helpful
+                </button>
+                <button
+                  id="feedback-down-btn"
+                  onClick={() => handleFeedback(-1)}
+                  disabled={feedbackGiven !== null}
+                  className={`border rounded px-3 py-1 text-sm flex items-center ${feedbackGiven === -1 ? "bg-red-600 text-white" : ""}`}
+                >
+                  <span className="mr-2">👎</span>
+                  Not Helpful
+                </button>
+                {feedbackGiven && (
+                  <span className="text-sm text-gray-600">
+                    Thank you for your feedback!
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Sidebar with trip details */}
           <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-green-600" />
-                  Budget Estimate
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span>Budget Range:</span>
-                    <span className="font-medium">
-                      ₹
-                      {itinerary.itinerary.budget_estimate.low.toLocaleString()}{" "}
-                      - ₹
-                      {itinerary.itinerary.budget_estimate.high.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Median Estimate:</span>
-                    <span className="font-medium text-green-600">
-                      ₹
-                      {itinerary.itinerary.budget_estimate.median.toLocaleString()}
-                    </span>
-                  </div>
+            <div className="bg-white rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-green-600">💰</span>
+                <span className="font-bold">Budget Estimate</span>
+              </div>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Budget Range:</span>
+                  <span className="font-medium">
+                    ₹
+                    {itinerary.itinerary.budget_estimate.low.toLocaleString()} {" "}
+                    - ₹
+                    {itinerary.itinerary.budget_estimate.high.toLocaleString()}
+                  </span>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="flex justify-between">
+                  <span>Median Estimate:</span>
+                  <span className="font-medium text-green-600">
+                    ₹
+                    {itinerary.itinerary.budget_estimate.median.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Trip Details</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm">
+            <div className="bg-white rounded-lg p-4">
+              <div className="font-bold mb-2">Trip Details</div>
+              <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span>Travelers:</span>
                   <span className="font-medium">
@@ -422,25 +336,19 @@ export function ItineraryDisplay({
                     {itinerary.itinerary.meta.budget}
                   </span>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {itinerary.itinerary.source_facts &&
               itinerary.itinerary.source_facts.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-sm">
-                      Useful Information
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-1 text-xs text-gray-600">
-                      {itinerary.itinerary.source_facts.map((fact, idx) => (
-                        <li key={idx}>• {fact}</li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
+                <div className="bg-white rounded-lg p-4">
+                  <div className="font-bold mb-2 text-sm">Useful Information</div>
+                  <ul className="space-y-1 text-xs text-gray-600">
+                    {itinerary.itinerary.source_facts.map((fact, idx) => (
+                      <li key={idx}>• {fact}</li>
+                    ))}
+                  </ul>
+                </div>
               )}
           </div>
         </div>

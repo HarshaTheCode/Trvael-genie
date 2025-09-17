@@ -137,7 +137,7 @@ Return ONLY the JSON object - no markdown, no explanations, no extra text.`;
       contents: [
         {
           parts: [{ text: this.SYSTEM_PROMPT }, { text: prompt }],
-        },
+        }
       ],
       generationConfig: {
         temperature: temperature,

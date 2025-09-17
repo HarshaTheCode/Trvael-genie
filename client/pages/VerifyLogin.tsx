@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
+import CardComponent, {
   CardContent,
   CardDescription,
   CardHeader,
@@ -88,7 +87,7 @@ export default function VerifyLogin() {
           </div>
         </div>
 
-        <Card className="shadow-xl">
+        <CardComponent className="shadow-xl">
           <CardHeader>
             <CardTitle className="text-center flex items-center justify-center gap-2">
               {status === "loading" && (
@@ -176,7 +175,7 @@ export default function VerifyLogin() {
               )}
             </div>
           </CardContent>
-        </Card>
+  </CardComponent>
 
         {/* Help text */}
         <div className="text-center">

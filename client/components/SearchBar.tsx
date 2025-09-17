@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Icons } from '@/components/ui/icons';
+
 
 interface SearchBarProps {
   className?: string;
@@ -31,37 +29,34 @@ export function SearchBar({
   };
 
   return (
-    <form onSubmit={handleSubmit} className={`relative ${className}`}>
-      <div className="relative">
-        <Icons.search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
+    <form onSubmit={handleSubmit} className={`relative ${className || ''}`} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div style={{ position: 'relative', flex: 1 }}>
+        <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#888' }} role="img" aria-label="Search">🔍</span>
+        <input
           type="search"
           placeholder={placeholder}
-          className="w-full rounded-full bg-background pl-10 pr-10 focus-visible:ring-1 focus-visible:ring-ring"
+          style={{ width: '100%', borderRadius: 999, background: 'white', padding: '8px 36px 8px 36px', border: '1px solid #e5e7eb', outline: 'none' }}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
         {searchQuery && (
-          <Button
+          <button
             type="button"
-            variant="ghost"
-            size="icon"
-            className="absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full"
+            style={{ position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
             onClick={() => setSearchQuery('')}
+            aria-label="Clear search"
           >
-            <Icons.close className="h-4 w-4" />
-            <span className="sr-only">Clear search</span>
-          </Button>
+            <span role="img" aria-label="Clear">❌</span>
+          </button>
         )}
       </div>
-      <Button
+      <button
         type="submit"
-        size="sm"
-        className="ml-2 hidden rounded-full sm:inline-flex"
+        style={{ borderRadius: 999, background: '#0d9488', color: 'white', padding: '8px 20px', border: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
       >
-        <Icons.search className="mr-2 h-4 w-4" />
+        <span role="img" aria-label="Search">🔍</span>
         Search
-      </Button>
+      </button>
     </form>
   );
 }

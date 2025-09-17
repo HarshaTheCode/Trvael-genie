@@ -1,0 +1,38 @@
+Hello! Here are the detailed step-by-step instructions to set up your Supabase database correctly.
+Following these steps will create all the necessary tables and functions for the application to work, including the new "History" feature.
+
+**Step 1: Get the SQL code**
+
+The SQL code you need to run is located in the file `server/database/supabase-functions.sql`.
+I have already updated this file with all the necessary commands. You just need to copy its content.
+
+**Step 2: Go to your Supabase Project**
+
+1.  Open your web browser and go to the Supabase website: https://supabase.com/
+2.  Log in to your account.
+3.  Select the project that you are using for this application.
+
+**Step 3: Go to the SQL Editor**
+
+1.  In your Supabase project dashboard, look for the menu on the left side of the screen.
+2.  Click on the "SQL Editor" icon. It looks like this: </>
+
+**Step 4: Paste and Run the SQL**
+
+1.  In the SQL Editor, you will see a text area where you can write SQL queries.
+2.  Copy the **entire content** of the `server/database/supabase-functions.sql` file.
+3.  Paste the copied SQL code into the text area in the Supabase SQL Editor.
+4.  Click the "Run" button to execute the SQL.
+
+**Step 5: Verify the setup**
+
+After running the SQL, you should see a "Success! No rows returned" message.
+This means that all the tables and functions have been created successfully.
+You can also check the "Table Editor" section in your Supabase dashboard to see the new tables, including `users`, `itineraries`, and `search_history`.
+
+**What about the `setup-database.ts` script?**
+
+I have also created a script `server/setup-database.ts` that can set up the database automatically. However, since you are following these manual instructions, you don't need to run that script. The manual SQL execution is the most reliable way to set up the database at this point.
+
+After you have completed these steps, the application should be fully functional, including the history feature.
+If you have any more questions, feel free to ask!

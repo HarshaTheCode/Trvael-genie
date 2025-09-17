@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
-import { Database } from '../types/database';
+// NOTE: Database type generated file has caused many 'never' types across the codebase.
+// To restore developer workflow quickly we avoid passing the generic here. If you want
+// strict typing later, we should regenerate/fix `server/types/database.ts` contents.
 
 // Supabase client configuration
 const supabaseUrl = process.env.SUPABASE_URL || 'https://hyhmvmqvmmaiajhjmtkk.supabase.co';
@@ -7,7 +9,7 @@ const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsIn
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5aG12bXF2bW1haWFqaGptdGtrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcxNzQzMDgwMCwiZXhwIjoyMDMzMDA2ODAwfQ.Nh0fPXLQnpZ-5oULQQVXCmXHk2D9gNCRUlMvWAzEI-I';
 
 // Create Supabase client for server-side operations
-export const supabase = createClient<Database>(supabaseUrl, supabaseServiceKey, {
+export const supabase = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     autoRefreshToken: false,
     persistSession: false
@@ -15,7 +17,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseServiceKey, 
 });
 
 // Create Supabase client for client-side operations
-export const supabaseClient = createClient<Database>(supabaseUrl, supabaseAnonKey);
+export const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
 
 export class SupabaseService {
   /**
@@ -58,6 +60,17 @@ export class SupabaseService {
         console.log('Magic tokens table does not exist. Please run the SQL setup manually.');
       } else {
         console.log('Magic tokens table exists ✓');
+      }
+
+      const { error: historyError } = await supabase
+        .from('search_history')
+        .select('id')
+        .limit(1);
+
+      if (historyError) {
+        console.log('Search history table does not exist. Please run the SQL setup manually.');
+      } else {
+        console.log('Search history table exists ✓');
       }
 
       console.log('Database initialization check completed');
@@ -394,6 +407,83 @@ export class SupabaseService {
       return data;
     } catch (error) {
       console.error('Error in updateItinerary:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Store search history
+   */
+  static async storeSearchHistory(historyData: {
+    user_id?: string;
+    itinerary_data: any;
+  }) {
+    try {
+      const { data, error } = await supabase
+        .from('search_history')
+        .insert([{
+          user_id: historyData.user_id,
+          itinerary_data: historyData.itinerary_data,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error storing search history:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in storeSearchHistory:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Get search history for a user
+   */
+  static async getSearchHistory(userId: string) {
+    try {
+      const { data, error } = await supabase
+        .from('search_history')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching search history:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in getSearchHistory:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get a single search history item by id
+   */
+  static async getSearchHistoryById(id: string) {
+    try {
+      const { data, error } = await supabase
+        .from('search_history')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching search history by id:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in getSearchHistoryById:', error);
       return null;
     }
   }

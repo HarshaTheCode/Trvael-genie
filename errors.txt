@@ -1,0 +1,18 @@
+LLM attempt 1 failed, retrying with temperature 0.0
+Gemini API error: 503 {
+  "error": {
+    "code": 503,
+    "message": "The model is overloaded. Please try again later.",
+    "status": "UNAVAILABLE"
+  }
+}
+
+LLM generation failed after retries: Error: Gemini API error: 503
+    at LLMService.callGeminiAPI (file:///C:/Harsha%20space/Where%20should%20i%20%20store/clone%20of%20the%20web%20app/New%20folder2345/Travel-builder/node_modules/.vite-temp/vite.config.ts.timestamp-1757947460545-468cf796a82b.mjs:707:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async LLMService.generateItinerary (file:///C:/Harsha%20space/Where%20should%20i%20%20store/clone%20of%20the%20web%20app/New%20folder2345/Travel-builder/node_modules/.vite-temp/vite.config.ts.timestamp-1757947460545-468cf796a82b.mjs:653:26)
+    at async generateItinerary (file:///C:/Harsha%20space/Where%20should%20i%20%20store/clone%20of%20the%20web%20app/New%20folder2345/Travel-builder/node_modules/.vite-temp/vite.config.ts.timestamp-1757947460545-468cf796a82b.mjs:1537:25)
+LLM generation failed: Error: LLM_INVALID_JSON
+    at LLMService.generateItinerary (file:///C:/Harsha%20space/Where%20should%20i%20%20store/clone%20of%20the%20web%20app/New%20folder2345/Travel-builder/node_modules/.vite-temp/vite.config.ts.timestamp-1757947460545-468cf796a82b.mjs:666:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async generateItinerary (file:///C:/Harsha%20space/Where%20should%20i%20%20store/clone%20of%20the%20web%20app/New%20folder2345/Travel-builder/node_modules/.vite-temp/vite.config.ts.timestamp-1757947460545-468cf796a82b.mjs:1537:25)

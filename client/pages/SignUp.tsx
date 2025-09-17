@@ -1,10 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Icons } from '@/components/ui/icons';
+
 import { toast } from 'sonner';
 
 export default function SignUp() {
@@ -46,67 +42,64 @@ export default function SignUp() {
   };
 
   return (
-    <div className="container flex h-screen w-screen flex-col items-center justify-center">
+    <div style={{ minHeight: '100vh', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
       <Link
         to="/"
-        className="absolute left-4 top-4 md:left-8 md:top-8 inline-flex items-center justify-center rounded-lg border border-transparent bg-transparent text-sm font-medium transition-colors hover:bg-muted hover:text-foreground"
+        style={{ position: 'absolute', left: 24, top: 24, display: 'inline-flex', alignItems: 'center', borderRadius: 6, fontSize: 14, fontWeight: 500, color: '#334155', textDecoration: 'none', padding: '4px 8px', background: '#f1f5f9' }}
       >
-        <Icons.chevronLeft className="mr-2 h-4 w-4" />
+        <span role="img" aria-label="Back" style={{ marginRight: 6 }}>⬅️</span>
         Back to home
       </Link>
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl">Create an account</CardTitle>
-          <CardDescription>Enter your email and password to create your account</CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="name@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="confirm-password">Confirm Password</Label>
-              <Input
-                id="confirm-password"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
-              Sign Up
-            </Button>
-          </CardContent>
-        </form>
-        <CardFooter className="flex flex-wrap items-center justify-between gap-2">
-          <div className="text-sm text-muted-foreground">
-            <span className="mr-1 hidden sm:inline-block">Already have an account?</span>
-            <Link to="/login" className="text-primary underline-offset-4 hover:underline">
-              Sign in
-            </Link>
+      <div style={{ width: '100%', maxWidth: 400, border: '1px solid #e5e7eb', boxShadow: '0 2px 8px #0001', borderRadius: 12, background: 'white', padding: 24 }}>
+        <div style={{ textAlign: 'center', marginBottom: 16 }}>
+          <div style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>Create an account</div>
+          <div style={{ color: '#64748b', fontSize: 15 }}>Enter your details to get started</div>
+        </div>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <label htmlFor="email" style={{ fontSize: 14, fontWeight: 500, color: '#334155' }}>Email</label>
+            <input
+              id="email"
+              type="email"
+              placeholder="name@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              style={{ border: '1px solid #cbd5e1', borderRadius: 6, padding: '8px 12px', fontSize: 15 }}
+            />
           </div>
-        </CardFooter>
-      </Card>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <label htmlFor="password" style={{ fontSize: 14, fontWeight: 500, color: '#334155' }}>Password</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              style={{ border: '1px solid #cbd5e1', borderRadius: 6, padding: '8px 12px', fontSize: 15 }}
+            />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <label htmlFor="confirm-password" style={{ fontSize: 14, fontWeight: 500, color: '#334155' }}>Confirm Password</label>
+            <input
+              id="confirm-password"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              style={{ border: '1px solid #cbd5e1', borderRadius: 6, padding: '8px 12px', fontSize: 15 }}
+            />
+          </div>
+          <button type="submit" style={{ width: '100%', background: '#0d9488', color: 'white', border: 'none', borderRadius: 6, padding: '10px 0', fontWeight: 600, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.7 : 1 }} disabled={isLoading}>
+            {isLoading && <span role="img" aria-label="Loading" style={{ marginRight: 6 }}>⏳</span>}
+            Sign Up
+          </button>
+        </form>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 18, fontSize: 14, color: '#64748b' }}>
+          <span style={{ marginRight: 4 }}>Already have an account?</span>
+          <Link to="/login" style={{ color: '#0d9488', textDecoration: 'underline', fontWeight: 500 }}>Sign in</Link>
+        </div>
+      </div>
     </div>
   );
 }

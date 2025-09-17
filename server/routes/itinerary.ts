@@ -41,7 +41,10 @@ export const generateItinerary: RequestHandler = async (req, res) => {
       });
     }
 
-    const request: TravelRequest = sanitizedRequest;
+    const request: TravelRequest = {
+      ...sanitizedRequest,
+  userId: (req as any).user?.id,
+    };
 
     // Get user identifier for rate limiting
     const userIdOrIP = ValidationService.getUserIdentifier(req);
@@ -88,32 +91,30 @@ export const generateItinerary: RequestHandler = async (req, res) => {
       // Cache the result
       CacheService.setCachedItinerary(cacheKey, itinerary);
 
-      // Store in Supabase database
+      // Store in Supabase search history
       const itineraryId = randomUUID();
-      let storedItinerary = null;
-      
-      try {
-        storedItinerary = await SupabaseService.storeItinerary({
-          id: itineraryId,
-          user_id: request.userId,
-          input_payload: normalizedRequest,
-          output_json: itinerary,
-          cached_key: cacheKey,
-        });
-      } catch (error) {
-        console.error('Failed to store itinerary in Supabase:', error);
+      let historyItem = null;
+
+      if (request.userId) {
+        try {
+          historyItem = await SupabaseService.storeSearchHistory({
+            user_id: request.userId,
+            itinerary_data: itinerary,
+          });
+        } catch (error) {
+          console.error('Failed to store search history in Supabase:', error);
+          return res.status(500).json({
+            success: false,
+            error: 'Failed to save itinerary to your history. Please try again.',
+          });
+        }
       }
 
-      if (!storedItinerary) {
-        console.log('Falling back to in-memory storage');
-        // Fallback to in-memory storage
-        itineraries.set(itineraryId, {
-          id: itineraryId,
-          user_id: request.userId,
-          input_payload: normalizedRequest,
-          output_json: itinerary,
-          cached_key: cacheKey,
-          created_at: new Date().toISOString(),
+      if (request.userId && !historyItem) {
+        console.error('CRITICAL: Failed to store search history and no fallback is available.');
+        return res.status(500).json({
+            success: false,
+            error: 'Failed to save the itinerary to your history. Please try again later.',
         });
       }
 

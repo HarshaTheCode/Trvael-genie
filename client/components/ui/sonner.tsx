@@ -1,29 +1,8 @@
-import { useTheme } from "next-themes";
-import { Toaster as Sonner } from "sonner";
+import React from 'react';
 
-type ToasterProps = React.ComponentProps<typeof Sonner>;
-
-const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme();
-
-  return (
-    <Sonner
-      theme={theme as ToasterProps["theme"]}
-      className="toaster group"
-      toastOptions={{
-        classNames: {
-          toast:
-            "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
-          description: "group-[.toast]:text-muted-foreground",
-          actionButton:
-            "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
-          cancelButton:
-            "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
-        },
-      }}
-      {...props}
-    />
-  );
+// Minimal Toaster shim: renders a container where toast UI can be mounted if needed.
+export const Toaster: React.FC = () => {
+	return <div aria-live="polite" id="app-toaster" style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 9999 }} />;
 };
 
-export { Toaster };
+export default Toaster;

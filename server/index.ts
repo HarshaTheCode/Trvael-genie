@@ -47,6 +47,7 @@ import {
   optionalAuth,
   authenticateAdmin,
 } from "./services/auth";
+import historyRouter from "./routes/history";
 
 export async function createServer() {
   const app = express();
@@ -77,7 +78,7 @@ export async function createServer() {
   app.post("/api/auth/refresh", authenticateJWT, refreshToken);
 
   // Travel Itinerary API routes (with optional auth for anonymous usage)
-  app.post("/api/generate-itinerary", optionalAuth, generateItinerary);
+  app.post("/api/generate-itinerary", authenticateJWT, generateItinerary);
   
   app.post("/api/export", exportItinerary);
   app.post("/api/save-email", saveEmail);
@@ -99,6 +100,9 @@ export async function createServer() {
   app.get("/api/feedback/:itineraryId", getFeedbackStats);
   app.get("/api/feedback/check/:itineraryId", optionalAuth, checkUserFeedback);
   app.get("/api/admin/feedback", authenticateAdmin, getAllFeedback);
+
+  // History routes
+  app.use("/api/history", historyRouter);
 
   return app;
 }
