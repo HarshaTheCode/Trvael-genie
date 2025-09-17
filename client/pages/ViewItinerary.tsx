@@ -1,37 +1,7 @@
-
-import { Link } from "react-router-dom";
-
-const title = "Sample Trip Title";
-const heroImage = "/placeholder.svg";
-const originalRequest = {
-  destination: "Paris",
-  startDate: "2025-09-20",
-  endDate: "2025-09-27",
-  travelers: 2,
-  style: "Adventure",
-  budget: "Mid"
-};
-const itineraryData = {
-  days: [
-    {
-      day: 1,
-      date: "2025-09-20",
-      segments: [
-        {
-          time: "09:00",
-          duration_min: 60,
-          place: "Eiffel Tower",
-          note: "Visit the Eiffel Tower",
-          food: "Croissant",
-          transport_min_to_next: 15
-        }
-      ],
-      daily_tip: "Buy tickets in advance!"
-    }
-  ]
-};
-const budgetRange = "$2000 - $3000";
-const medianEstimate = "$2500";
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { useAuthenticatedFetch } from '@/contexts/AuthContext';
+import { LoadingSpinner } from '@/components/LoadingSpinner'; 
 
 function getIconForSegment(note: string) {
   if (note && note.toLowerCase().includes("food")) return () => <span role="img" aria-label="Food">🍽️</span>;
@@ -40,11 +10,56 @@ function getIconForSegment(note: string) {
 }
 
 export default function ViewItinerary() {
+  const { id } = useParams<{ id: string }>();
+  const authenticatedFetch = useAuthenticatedFetch();
+  const [itinerary, setItinerary] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!id) {
+      setError('No itinerary ID provided.');
+      setLoading(false);
+      return;
+    }
+
+    const fetchItinerary = async () => {
+      try {
+        const res = await authenticatedFetch(`/api/itineraries/${id}`);
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.message || 'Failed to fetch itinerary');
+        }
+        setItinerary(data.itinerary);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchItinerary();
+  }, [id, authenticatedFetch]);
+
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen"><LoadingSpinner /></div>;
+  }
+
+  if (error) {
+    return <div className="flex items-center justify-center min-h-screen text-red-500">Error: {error}</div>;
+  }
+
+  if (!itinerary) {
+    return <div className="flex items-center justify-center min-h-screen">Itinerary not found.</div>;
+  }
+
+  const { title, heroImage, originalRequest, itineraryData, budgetRange, medianEstimate } = itinerary;
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <div className="relative h-96 overflow-hidden">
-        <img src={heroImage} alt={title} className="absolute inset-0 w-full h-full object-cover" />
+        <img src={heroImage || '/placeholder.svg'} alt={title} className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
         {/* Header Navigation */}
         <div className="absolute top-0 left-0 right-0 p-6 flex items-center justify-between">
@@ -91,7 +106,7 @@ export default function ViewItinerary() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Itinerary Timeline */}
           <div className="lg:col-span-2 space-y-8">
-            {itineraryData.days.map((day) => (
+            {itineraryData.days.map((day:any) => (
               <div key={day.day} className="overflow-hidden border-0 shadow-lg rounded-lg bg-white mb-6">
                 <div className="bg-gradient-to-r from-teal-600 to-teal-500 text-white p-6">
                   <div className="flex items-center justify-between">
@@ -108,7 +123,7 @@ export default function ViewItinerary() {
                   <div className="relative">
                     {/* Timeline Line */}
                     <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-border" />
-                    {day.segments.map((segment, activityIndex) => {
+                    {day.segments.map((segment:any, activityIndex:number) => {
                       const IconComponent = getIconForSegment(segment.note);
                       return (
                         <div key={activityIndex} className="relative flex gap-6 p-6 hover:bg-muted/50 transition-colors">

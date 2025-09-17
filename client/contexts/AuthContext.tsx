@@ -52,10 +52,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, []);
 
-  const setToken = (newToken: string) => {
+  const setToken = async (newToken: string) => {
     setTokenState(newToken);
     localStorage.setItem("auth_token", newToken);
-    fetchCurrentUser(newToken);
+    await fetchCurrentUser(newToken);
   };
 
   const fetchCurrentUser = async (authToken: string) => {
