@@ -74,7 +74,7 @@ export default function Index() {
     return (
       <ItineraryDisplay
         itinerary={generatedItinerary}
-        originalRequest={formData}
+        originalRequest={formData!}
         onEdit={() => setGeneratedItinerary(null)}
         onRegenerate={(newRequest) => {
           setFormData(newRequest);

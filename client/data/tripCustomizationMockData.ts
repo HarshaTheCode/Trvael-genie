@@ -1,5 +1,5 @@
 // Mock data for the trip customization form
-import { BudgetLevel, TravelStyle, AccessibilityOption, TravelPace } from '@/types/enums';
+import { BudgetLevel, TravelStyle, AccessibilityOption, TravelPace } from '../types/enums';
 
 export const mockRootProps = {
   initialDestination: "Jaipur",

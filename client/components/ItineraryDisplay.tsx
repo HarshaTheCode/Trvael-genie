@@ -1,7 +1,7 @@
 import { useState } from "react";
 // Removed shadcn/ui and lucide-react imports. Use standard HTML elements and emojis instead.
-import { GenerateItineraryResponse, TravelRequest } from "@shared/api";
-import { useAuth, useAuthenticatedFetch } from "@/contexts/AuthContext";
+import { GenerateItineraryResponse, TravelRequest } from "../../shared/api";
+import { useAuth, useAuthenticatedFetch } from "../contexts/AuthContext";
 import { toast } from "sonner";
 
 interface ItineraryDisplayProps {

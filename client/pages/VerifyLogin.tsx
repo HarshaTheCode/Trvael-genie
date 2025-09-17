@@ -6,7 +6,7 @@ import CardComponent, {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "../components/ui/card";
 import {
   Compass,
   CheckCircle,
@@ -50,7 +50,7 @@ export default function VerifyLogin() {
 
       if (result.success) {
         setStatus("success");
-        setMessage(result.message);
+        setMessage(result.message ?? "");
         toast.success("Successfully signed in!");
 
         // Redirect after a short delay
@@ -59,7 +59,7 @@ export default function VerifyLogin() {
         }, 2000);
       } else {
         setStatus("error");
-        setMessage(result.message);
+        setMessage(result.message ?? "");
         toast.error(result.message);
       }
     } catch (error) {

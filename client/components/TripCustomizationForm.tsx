@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { TripFormData, TripFormProps } from '@/types/tripForm';
-import { BudgetLevel, TravelStyle, AccessibilityOption, TravelPace } from '@/types/enums';
+import { TripFormData, TripFormProps } from '../types/tripForm';
+import { BudgetLevel, TravelStyle, AccessibilityOption, TravelPace } from '../types/enums';
 import {
   formatBudgetLevel,
   formatTravelStyle,
   formatAccessibilityOption,
   formatTravelPace,
-} from '@/lib/formatters';
+} from '../lib/formatters';
 
 const TripCustomizationForm: React.FC<TripFormProps> = ({
   initialData = {},

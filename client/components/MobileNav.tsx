@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { Icons } from '@/components/ui/icons';
+import { cn } from '../lib/utils';
+import { Icons } from '../components/ui/icons';
 
 export function MobileNav() {
   const location = useLocation();

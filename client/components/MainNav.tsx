@@ -1,9 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Icons } from '@/components/ui/icons';
-import { cn } from '@/lib/utils';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { UserNav } from '@/components/UserNav';
+import { Icons } from '../components/ui/icons';
+import { cn } from '../lib/utils';
+import { useAuth } from '../contexts/AuthContext';
+import { Button } from '../components/ui/button';
+import { UserNav } from '../components/UserNav';
 
 export function MainNav() {
   const { isAuthenticated } = useAuth();

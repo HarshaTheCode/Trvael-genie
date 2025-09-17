@@ -1,5 +1,5 @@
 // String formatting functions for travel form
-import { BudgetLevel, TravelStyle, AccessibilityOption, TravelPace } from '@/types/enums';
+import { BudgetLevel, TravelStyle, AccessibilityOption, TravelPace } from '../types/enums';
 
 export const formatBudgetLevel = (budget: BudgetLevel): string => {
   switch (budget) {
