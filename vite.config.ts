@@ -33,6 +33,9 @@ export default defineConfig(async ({ mode }) => {
       outDir: "dist/spa",
     },
     plugins: [react(), expressPlugin(apiPort)],
+    css: {
+      postcss: './postcss.config.cjs'
+    },
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./client"),

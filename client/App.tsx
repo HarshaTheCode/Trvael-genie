@@ -27,7 +27,11 @@ const App = () => (
   <SonnerToaster />
   {/* Keep local Sonner shim mounted for preview builds if needed */}
   <SonnerShim />
-      <BrowserRouter>
+      <BrowserRouter
+        future={{
+          v7_startTransition: true
+        }}
+      >
         <Routes>
            <Route path="/" element={<LandingPage />} />
 

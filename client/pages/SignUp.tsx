@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-
 import { toast } from 'sonner';
+import './SignUp.css';
 
 export default function SignUp() {
   const [email, setEmail] = useState('');
@@ -42,22 +42,19 @@ export default function SignUp() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-      <Link
-        to="/"
-        style={{ position: 'absolute', left: 24, top: 24, display: 'inline-flex', alignItems: 'center', borderRadius: 6, fontSize: 14, fontWeight: 500, color: '#334155', textDecoration: 'none', padding: '4px 8px', background: '#f1f5f9' }}
-      >
+    <div className="signup-page-container">
+      <Link to="/" className="back-to-home-link">
         <span role="img" aria-label="Back" style={{ marginRight: 6 }}>⬅️</span>
         Back to home
       </Link>
-      <div style={{ width: '100%', maxWidth: 400, border: '1px solid #e5e7eb', boxShadow: '0 2px 8px #0001', borderRadius: 12, background: 'white', padding: 24 }}>
-        <div style={{ textAlign: 'center', marginBottom: 16 }}>
-          <div style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>Create an account</div>
-          <div style={{ color: '#64748b', fontSize: 15 }}>Enter your details to get started</div>
+      <div className="signup-form-card">
+        <div className="signup-form-header">
+          <div className="signup-form-title">Create an account</div>
+          <div className="signup-form-subtitle">Enter your details to get started</div>
         </div>
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label htmlFor="email" style={{ fontSize: 14, fontWeight: 500, color: '#334155' }}>Email</label>
+        <form onSubmit={handleSubmit} className="signup-form">
+          <div className="form-group">
+            <label htmlFor="email" className="form-label">Email</label>
             <input
               id="email"
               type="email"
@@ -65,39 +62,39 @@ export default function SignUp() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              style={{ border: '1px solid #cbd5e1', borderRadius: 6, padding: '8px 12px', fontSize: 15 }}
+              className="form-input"
             />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label htmlFor="password" style={{ fontSize: 14, fontWeight: 500, color: '#334155' }}>Password</label>
+          <div className="form-group">
+            <label htmlFor="password" className="form-label">Password</label>
             <input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              style={{ border: '1px solid #cbd5e1', borderRadius: 6, padding: '8px 12px', fontSize: 15 }}
+              className="form-input"
             />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label htmlFor="confirm-password" style={{ fontSize: 14, fontWeight: 500, color: '#334155' }}>Confirm Password</label>
+          <div className="form-group">
+            <label htmlFor="confirm-password" className="form-label">Confirm Password</label>
             <input
               id="confirm-password"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              style={{ border: '1px solid #cbd5e1', borderRadius: 6, padding: '8px 12px', fontSize: 15 }}
+              className="form-input"
             />
           </div>
-          <button type="submit" style={{ width: '100%', background: '#0d9488', color: 'white', border: 'none', borderRadius: 6, padding: '10px 0', fontWeight: 600, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.7 : 1 }} disabled={isLoading}>
+          <button type="submit" className="submit-btn" disabled={isLoading}>
             {isLoading && <span role="img" aria-label="Loading" style={{ marginRight: 6 }}>⏳</span>}
             Sign Up
           </button>
         </form>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 18, fontSize: 14, color: '#64748b' }}>
-          <span style={{ marginRight: 4 }}>Already have an account?</span>
-          <Link to="/login" style={{ color: '#0d9488', textDecoration: 'underline', fontWeight: 500 }}>Sign in</Link>
+        <div className="login-link-container">
+          <span>Already have an account?</span>
+          <Link to="/login" className="login-link">Sign in</Link>
         </div>
       </div>
     </div>

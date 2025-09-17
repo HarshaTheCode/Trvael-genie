@@ -1,0 +1,192 @@
+.index-page-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f9fafb;
+  }
+  
+  .sidebar {
+    width: 20%;
+    min-width: 250px;
+    background-color: white;
+    border-right: 1px solid #e5e7eb;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+  
+  .sidebar-logo {
+    height: 32px;
+    width: 32px;
+    color: #4f46e5;
+  }
+  
+  .sidebar-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #4f46e5;
+  }
+  
+  .sidebar-content {
+    flex-grow: 1;
+  }
+  
+  .trip-details-section {
+    margin-bottom: 24px;
+  }
+  
+  .trip-details-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 8px;
+  }
+  
+  .trip-details-info {
+    font-size: 14px;
+    color: #6b7280;
+  }
+  
+  .sidebar-footer {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .sidebar-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #f3f4f6;
+    color: #374151;
+    padding: 10px 16px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+  }
+  
+  .sidebar-btn:hover {
+    background-color: #e5e7eb;
+  }
+  
+  .main-content {
+    flex-grow: 1;
+    padding: 32px;
+  }
+  
+  .main-content-container {
+    max-width: 896px;
+    margin: 0 auto;
+  }
+  
+  .main-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  
+  .main-title {
+    font-size: 30px;
+    font-weight: 700;
+    color: #111827;
+  }
+  
+  .main-subtitle {
+    color: #6b7280;
+    margin-top: 8px;
+  }
+  
+  .form-container {
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    padding: 24px;
+  }
+  
+  .error-message-container {
+    margin-top: 16px;
+    padding: 16px;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    color: #b91c1c;
+  }
+  
+  .preview-panel {
+    width: 20%;
+    min-width: 250px;
+    background-color: white;
+    border-left: 1px solid #e5e7eb;
+    padding: 24px;
+  }
+  
+  .preview-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 16px;
+  }
+  
+  .preview-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .preview-item h3 {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+  }
+  
+  .preview-item p {
+    color: #6b7280;
+  }
+  
+  .generate-btn-container {
+    margin-top: 32px;
+  }
+  
+  .generate-btn {
+    width: 100%;
+    background-color: #4f46e5;
+    color: white;
+    padding: 14px 0;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .generate-btn:hover {
+    background-color: #4338ca;
+  }
+  
+  .generate-btn:disabled {
+    background-color: #a5b4fc;
+    cursor: not-allowed;
+  }
+  
+  .history-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+  }
+  
+  .history-overlay-backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+    flex-grow: 1;
+  }
+  

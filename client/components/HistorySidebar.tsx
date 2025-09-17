@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useAuthenticatedFetch } from '@/contexts/AuthContext';
-import { GenerateItineraryResponse, ItineraryResponse } from '@shared/api';
+import { useAuthenticatedFetch } from '../contexts/AuthContext';
+import { GenerateItineraryResponse, ItineraryResponse } from '../../shared/api';
 import { toast } from 'sonner';
 import { LoadingSpinner } from './LoadingSpinner';
 

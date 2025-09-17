@@ -1,7 +1,46 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useAuthenticatedFetch } from '@/contexts/AuthContext';
-import { LoadingSpinner } from '@/components/LoadingSpinner'; 
+import { useAuthenticatedFetch } from'../contexts/AuthContext';
+import { LoadingSpinner } from '../components/LoadingSpinner';
+
+// Type Definitions for Itinerary Data
+interface Segment {
+  time: string;
+  duration_min: number;
+  place: string;
+  note: string;
+  food?: string;
+  transport_min_to_next: number;
+}
+
+interface Day {
+  day: number;
+  date: string;
+  segments: Segment[];
+  daily_tip: string;
+}
+
+interface ItineraryData {
+  days: Day[];
+}
+
+interface OriginalRequest {
+  destination: string;
+  startDate: string;
+  endDate: string;
+  travelers: number;
+  style: string;
+  budget: string;
+}
+
+interface Itinerary {
+  title: string;
+  heroImage?: string;
+  originalRequest: OriginalRequest;
+  itineraryData: ItineraryData;
+  budgetRange: string;
+  medianEstimate: string;
+}
 
 function getIconForSegment(note: string) {
   if (note && note.toLowerCase().includes("food")) return () => <span role="img" aria-label="Food">🍽️</span>;
@@ -12,7 +51,7 @@ function getIconForSegment(note: string) {
 export default function ViewItinerary() {
   const { id } = useParams<{ id: string }>();
   const authenticatedFetch = useAuthenticatedFetch();
-  const [itinerary, setItinerary] = useState<any>(null);
+  const [itinerary, setItinerary] = useState<Itinerary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -106,7 +145,7 @@ export default function ViewItinerary() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Itinerary Timeline */}
           <div className="lg:col-span-2 space-y-8">
-            {itineraryData.days.map((day:any) => (
+            {itineraryData.days.map((day) => (
               <div key={day.day} className="overflow-hidden border-0 shadow-lg rounded-lg bg-white mb-6">
                 <div className="bg-gradient-to-r from-teal-600 to-teal-500 text-white p-6">
                   <div className="flex items-center justify-between">
@@ -123,7 +162,7 @@ export default function ViewItinerary() {
                   <div className="relative">
                     {/* Timeline Line */}
                     <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-border" />
-                    {day.segments.map((segment:any, activityIndex:number) => {
+                    {day.segments.map((segment, activityIndex) => {
                       const IconComponent = getIconForSegment(segment.note);
                       return (
                         <div key={activityIndex} className="relative flex gap-6 p-6 hover:bg-muted/50 transition-colors">

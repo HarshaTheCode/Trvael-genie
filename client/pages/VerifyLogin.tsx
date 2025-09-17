@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "../components/ui/button";
 import CardComponent, {
   CardContent,
   CardDescription,
@@ -14,7 +14,7 @@ import {
   Loader2,
   ArrowLeft,
 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 import { toast } from "sonner";
 
 export default function VerifyLogin() {
@@ -40,6 +40,12 @@ export default function VerifyLogin() {
 
   const verifyToken = async (token: string) => {
     try {
+      if (typeof verifyMagicLink !== "function") {
+        setStatus("error");
+        setMessage("Verification function is unavailable. Please try again later.");
+        toast.error("Verification unavailable");
+        return;
+      }
       const result = await verifyMagicLink(token);
 
       if (result.success) {

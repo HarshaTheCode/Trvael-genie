@@ -22,7 +22,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  setToken: (token: string) => void;
+  setToken: (token: string) => Promise<void>;
   verifyMagicLink?: (token: string) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
   refreshUser: () => Promise<void>;

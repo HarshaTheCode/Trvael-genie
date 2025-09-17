@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 // Removed all shadcn/ui and lucide-react imports. Use standard HTML elements and emojis instead.
-import { ItineraryResponse } from "@shared/api";
+import { ItineraryResponse } from "../../shared/api";
 import { toast } from "sonner";
 
 interface SharedItinerary {

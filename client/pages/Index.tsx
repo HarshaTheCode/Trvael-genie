@@ -1,39 +1,26 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-// Button removed: replaced with native <button>
-import { Compass, Loader2 } from "lucide-react";
-import { GenerateItineraryResponse } from "@shared/api";
-import { HistorySidebar } from "@/components/HistorySidebar";
-import { ItineraryDisplay } from "@/components/ItineraryDisplay";
-import TripCustomizationForm from "@/components/TripCustomizationForm";
-import { TripFormData } from "@/types/tripForm";
-import { useAuth, useAuthenticatedFetch } from "@/contexts/AuthContext";
+import { Compass, History, Save, User } from "lucide-react";
+import { GenerateItineraryResponse } from "../../shared/api";
+import { HistorySidebar } from "../components/HistorySidebar";
+import { ItineraryDisplay } from "../components/ItineraryDisplay";
+import TripCustomizationForm from "../components/TripCustomizationForm";
+import { TripFormData } from "../types/tripForm";
+import { useAuth, useAuthenticatedFetch } from "../contexts/AuthContext";
 import { toast } from "sonner";
-
-const galleryImages = [
-  "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  
-];
+import './Index.css';
 
 export default function Index() {
   const { user, isAuthenticated, logout } = useAuth();
   const authenticatedFetch = useAuthenticatedFetch();
   const [showHistory, setShowHistory] = useState(false);
   const [historyKey, setHistoryKey] = useState(0);
-  const [currentImage, setCurrentImage] = useState(0);
 
   const [isLoading, setIsLoading] = useState(false);
   const [generatedItinerary, setGeneratedItinerary] =
     useState<GenerateItineraryResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<TripFormData | null>(null);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentImage((prev) => (prev + 1) % galleryImages.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
 
   const handleHistoryItemClick = (itinerary: GenerateItineraryResponse) => {
     setGeneratedItinerary(itinerary);
@@ -98,64 +85,118 @@ export default function Index() {
   }
 
   return (
-    <div className="flex min-h-screen bg-white">
-      <div className="flex-grow">
-        <header className="absolute top-0 left-0 right-0 z-10 bg-white/95 border-b border-teal-100 shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <Compass className="h-8 w-8 text-teal-600" />
-              <h1 className="text-2xl font-bold text-teal-700">TravelGenie</h1>
-            </div>
-            <div className="flex items-center gap-4">
-              {isAuthenticated ? (
-                <>
-                  <button className="text-teal-700 hover:bg-teal-50 px-4 py-2 rounded transition" onClick={() => setShowHistory(!showHistory)}>
-                    🕑 History
-                  </button>
-                  <Link to="/saved-plans">
-                    <button className="text-teal-700 hover:bg-teal-50 px-4 py-2 rounded transition">
-                      💾 Saved Plans
-                    </button>
-                  </Link>
-                  <button className="text-teal-700 hover:bg-teal-50 px-4 py-2 rounded transition" onClick={logout}>
-                    🚪 Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link to="/login">
-                    <button className="text-teal-700 hover:bg-teal-50 px-4 py-2 rounded transition">🔑 Login</button>
-                  </Link>
-                  <Link to="/signup">
-                    <button className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded transition">📝 Sign Up</button>
-                  </Link>
-                </>
-              )}
+    <div className="index-page-container">
+      <div className="sidebar">
+        <div className="sidebar-header">
+          <Compass className="sidebar-logo" />
+          <h1 className="sidebar-title">TravelGenie</h1>
+        </div>
+        
+        <div className="sidebar-content">
+          <div className="trip-details-section">
+            <h2 className="trip-details-title">Trip Details</h2>
+            <div className="trip-details-info">
+              <p>Destination: {formData?.destination || 'Not set'}</p>
+              <p>Dates: {formData?.startDate ? `${formData.startDate} to ${formData.endDate}` : 'Not set'}</p>
+              <p>Travelers: {formData?.travelers || 'Not set'}</p>
             </div>
           </div>
-        </header>
-
-        <main
-          className="min-h-screen flex flex-col justify-center items-center bg-white"
-        >
-          <div className="w-full max-w-4xl py-24">
-            <div className="text-center p-4">
-              <h1 className="text-5xl font-extrabold mb-4 text-teal-800">Your AI Travel Planner for India</h1>
-              <p className="text-xl max-w-2xl mx-auto text-teal-600">Craft your dream itinerary in seconds. Just fill in the details below.</p>
-            </div>
-            <div className="bg-white border border-teal-100 rounded-xl shadow-lg p-8 mt-8">
-              <TripCustomizationForm onSubmit={handleSubmit} isLoading={isLoading} />
-            </div>
-          </div>
-        </main>
-
-        <footer className="bg-white border-t border-teal-100 py-8">
-          <div className="max-w-7xl mx-auto px-4 text-center">
-            <p className="text-teal-600">&copy; 2025 TravelGenie. All rights reserved.</p>
-          </div>
-        </footer>
+        </div>
+        
+        <div className="sidebar-footer">
+          {isAuthenticated ? (
+            <>
+              <Link to="/saved-plans">
+                <button className="sidebar-btn">
+                  <Save className="h-5 w-5" />
+                  <span>Saved Plans</span>
+                </button>
+              </Link>
+              <button 
+                onClick={() => setShowHistory(!showHistory)}
+                className="sidebar-btn"
+              >
+                <History className="h-5 w-5" />
+                <span>History</span>
+              </button>
+              <button 
+                onClick={logout}
+                className="sidebar-btn"
+              >
+                <User className="h-5 w-5" />
+                <span>Logout</span>
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login">
+                <button className="sidebar-btn">Login</button>
+              </Link>
+              <Link to="/signup">
+                <button className="sidebar-btn">Sign Up</button>
+              </Link>
+            </>
+          )}
+        </div>
       </div>
-      {isAuthenticated && showHistory && <HistorySidebar key={historyKey} onHistoryItemClick={handleHistoryItemClick} />}
+
+      <div className="main-content">
+        <div className="main-content-container">
+          <div className="main-header">
+            <h1 className="main-title">Customize Your Trip</h1>
+            <p className="main-subtitle">We'll generate your perfect itinerary based on your preferences</p>
+          </div>
+          
+          <div className="form-container">
+            <TripCustomizationForm onSubmit={handleSubmit} isLoading={isLoading} />
+          </div>
+          
+          {error && (
+            <div className="error-message-container">
+              {error}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="preview-panel">
+        <h2 className="preview-title">Quick Preview</h2>
+        <div className="preview-section">
+          <div className="preview-item">
+            <h3>Destination</h3>
+            <p>{formData?.destination || 'Not selected yet'}</p>
+          </div>
+          <div className="preview-item">
+            <h3>Style</h3>
+            <p>{formData?.style || 'Not selected yet'}</p>
+          </div>
+          <div className="preview-item">
+            <h3>Budget</h3>
+            <p>{formData?.budget || 'Not selected yet'}</p>
+          </div>
+          <div className="preview-item">
+            <h3>Pace</h3>
+            <p>{formData?.pace || 'Not selected yet'}</p>
+          </div>
+        </div>
+        
+        <div className="generate-btn-container">
+          <button 
+            className="generate-btn"
+            onClick={() => handleSubmit(formData || {} as TripFormData)}
+            disabled={!formData?.destination || isLoading}
+          >
+            {isLoading ? 'Generating...' : 'Generate Itinerary'}
+          </button>
+        </div>
+      </div>
+
+      {isAuthenticated && showHistory && (
+        <div className="history-overlay">
+          <div className="history-overlay-backdrop" onClick={() => setShowHistory(false)}></div>
+          <HistorySidebar key={historyKey} onHistoryItemClick={handleHistoryItemClick} />
+        </div>
+      )}
     </div>
   );
 }

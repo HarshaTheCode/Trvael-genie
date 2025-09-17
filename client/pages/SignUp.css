@@ -1,0 +1,134 @@
+.signup-page-container {
+    min-height: 100vh;
+    background: #f9fafb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  
+  .back-to-home-link {
+    position: absolute;
+    left: 24px;
+    top: 24px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4b5563;
+    text-decoration: none;
+    padding: 4px 8px;
+    background: #f3f4f6;
+    transition: background-color 0.2s ease;
+  }
+  
+  .back-to-home-link:hover {
+    background: #e5e7eb;
+  }
+  
+  .signup-form-card {
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    background: white;
+    padding: 24px;
+  }
+  
+  .signup-form-header {
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  
+  .signup-form-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #111827;
+  }
+  
+  .signup-form-subtitle {
+    color: #6b7280;
+    font-size: 15px;
+  }
+  
+  .signup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .form-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+  }
+  
+  .form-input {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 15px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .form-input:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    outline: none;
+  }
+  
+  .submit-btn {
+    width: 100%;
+    background: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 0;
+    font-weight: 600;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+  }
+  
+  .submit-btn:hover {
+    background: #4338ca;
+  }
+  
+  .submit-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  .login-link-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 18px;
+    font-size: 14px;
+    color: #6b7280;
+  }
+  
+  .login-link {
+    color: #4f46e5;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .login-link:hover {
+    text-decoration: underline;
+  }
+  
