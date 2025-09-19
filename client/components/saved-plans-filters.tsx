@@ -1,83 +1,120 @@
-
-import React from "react"
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Calendar, MapPin, Filter } from "lucide-react";
 
 interface SavedPlansFiltersProps {
-  onFilterChange?: (filters: { from?: string; to?: string; destination?: string; tripType?: string; duration?: string }) => void
+  onFilterChange?: (filters: { from?: string; to?: string; destination?: string; tripType?: string; duration?: string }) => void;
 }
 
 export function SavedPlansFilters({ onFilterChange }: SavedPlansFiltersProps) {
-  const [from, setFrom] = React.useState("");
-  const [to, setTo] = React.useState("");
-  const [destination, setDestination] = React.useState("");
-  const [tripType, setTripType] = React.useState("");
-  const [duration, setDuration] = React.useState("");
+  const [filters, setFilters] = React.useState({
+    from: "",
+    to: "",
+    destination: "",
+    tripType: "",
+    duration: "",
+  });
 
   const handleApply = () => {
-    onFilterChange?.({ from, to, destination, tripType, duration });
+    onFilterChange?.(filters);
+  };
+
+  const updateFilter = (key: string, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
   };
 
   return (
-    <div style={{ background: 'white', border: '1px solid #b2f5ea', boxShadow: '0 1px 4px #0001', borderRadius: 8, padding: 16, maxWidth: 400, margin: '0 auto' }}>
-      <div style={{ fontWeight: 600, color: '#134e4a', display: 'flex', alignItems: 'center', fontSize: 20, marginBottom: 12 }}>
-        <span role="img" aria-label="Filter" style={{ marginRight: 8 }}>🔎</span> Filter Plans
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <Card className="bg-card border-border">
+      <CardHeader>
+        <CardTitle className="flex items-center text-card-foreground">
+          <Filter className="w-5 h-5 mr-2 text-primary" />
+          Filter Plans
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
         {/* Date Range */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <label style={{ fontSize: 14, fontWeight: 500, color: '#334155' }}>Date Range</label>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            <div style={{ position: 'relative' }}>
-              <span style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} role="img" aria-label="Calendar">📅</span>
-              <input type="date" value={from} onChange={e => setFrom(e.target.value)} style={{ paddingLeft: 32, background: 'white', border: '1px solid #cbd5e1', borderRadius: 4, height: 32, width: '100%' }} placeholder="From" />
+        <div className="space-y-2">
+          <Label className="text-sm font-medium text-foreground">Date Range</Label>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="relative">
+              <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input 
+                type="date" 
+                className="pl-10 bg-background border-border" 
+                placeholder="From" 
+                value={filters.from}
+                onChange={(e) => updateFilter("from", e.target.value)}
+              />
             </div>
-            <div style={{ position: 'relative' }}>
-              <span style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} role="img" aria-label="Calendar">📅</span>
-              <input type="date" value={to} onChange={e => setTo(e.target.value)} style={{ paddingLeft: 32, background: 'white', border: '1px solid #cbd5e1', borderRadius: 4, height: 32, width: '100%' }} placeholder="To" />
+            <div className="relative">
+              <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input 
+                type="date" 
+                className="pl-10 bg-background border-border" 
+                placeholder="To" 
+                value={filters.to}
+                onChange={(e) => updateFilter("to", e.target.value)}
+              />
             </div>
           </div>
         </div>
 
         {/* Destination */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <label style={{ fontSize: 14, fontWeight: 500, color: '#334155' }}>Destination</label>
-          <div style={{ position: 'relative' }}>
-            <span style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} role="img" aria-label="Map Pin">📍</span>
-            <input placeholder="Search destinations..." value={destination} onChange={e => setDestination(e.target.value)} style={{ paddingLeft: 32, background: 'white', border: '1px solid #cbd5e1', borderRadius: 4, height: 32, width: '100%' }} />
+        <div className="space-y-2">
+          <Label className="text-sm font-medium text-foreground">Destination</Label>
+          <div className="relative">
+            <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Input 
+              placeholder="Search destinations..." 
+              className="pl-10 bg-background border-border" 
+              value={filters.destination}
+              onChange={(e) => updateFilter("destination", e.target.value)}
+            />
           </div>
         </div>
 
         {/* Trip Type */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <label style={{ fontSize: 14, fontWeight: 500, color: '#334155' }}>Trip Type</label>
-          <select value={tripType} onChange={e => setTripType(e.target.value)} style={{ background: 'white', border: '1px solid #cbd5e1', borderRadius: 4, height: 32, width: '100%' }}>
-            <option value="all">All Types</option>
-            <option value="leisure">Leisure</option>
-            <option value="business">Business</option>
-            <option value="adventure">Adventure</option>
-            <option value="cultural">Cultural</option>
-          </select>
+        <div className="space-y-2">
+          <Label className="text-sm font-medium text-foreground">Trip Type</Label>
+          <Select value={filters.tripType} onValueChange={(value) => updateFilter("tripType", value)}>
+            <SelectTrigger className="bg-background border-border">
+              <SelectValue placeholder="All Types" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="leisure">Leisure</SelectItem>
+              <SelectItem value="business">Business</SelectItem>
+              <SelectItem value="adventure">Adventure</SelectItem>
+              <SelectItem value="cultural">Cultural</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Duration */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <label style={{ fontSize: 14, fontWeight: 500, color: '#334155' }}>Duration</label>
-          <select value={duration} onChange={e => setDuration(e.target.value)} style={{ background: 'white', border: '1px solid #cbd5e1', borderRadius: 4, height: 32, width: '100%' }}>
-            <option value="all">Any Duration</option>
-            <option value="1-3">1-3 Days</option>
-            <option value="4-7">4-7 Days</option>
-            <option value="8-14">1-2 Weeks</option>
-            <option value="15+">2+ Weeks</option>
-          </select>
+        <div className="space-y-2">
+          <Label className="text-sm font-medium text-foreground">Duration</Label>
+          <Select value={filters.duration} onValueChange={(value) => updateFilter("duration", value)}>
+            <SelectTrigger className="bg-background border-border">
+              <SelectValue placeholder="Any Duration" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Any Duration</SelectItem>
+              <SelectItem value="1-3">1-3 Days</SelectItem>
+              <SelectItem value="4-7">4-7 Days</SelectItem>
+              <SelectItem value="8-14">1-2 Weeks</SelectItem>
+              <SelectItem value="15+">2+ Weeks</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
-        <button style={{ width: '100%', background: '#0d9488', color: 'white', border: 'none', borderRadius: 4, padding: '10px 0', fontWeight: 600, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }} onClick={handleApply}>
-          <span role="img" aria-label="Filter" style={{ marginRight: 8 }}>🔎</span> Filter
-        </button>
-      </div>
-    </div>
-  )
+        <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" onClick={handleApply}>
+          Apply Filters
+        </Button>
+      </CardContent>
+    </Card>
+  );
 }
-
-export default SavedPlansFilters

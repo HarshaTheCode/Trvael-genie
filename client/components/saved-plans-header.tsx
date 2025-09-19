@@ -1,7 +1,9 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "./saved-plans-header.module.css";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Plus, Search, User, LogOut } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 
 interface SavedPlansHeaderProps {
   userEmail?: string;
@@ -20,84 +22,55 @@ function SavedPlansHeader({ userEmail, onSearch, onCreate, onSignOut }: SavedPla
     navigate("/");
   };
 
-  // Simple dropdown state for account menu
-  const [showDropdown, setShowDropdown] = React.useState(false);
-  const toggleDropdown = () => setShowDropdown((v) => !v);
   const handleSignOut = () => {
-    setShowDropdown(false);
     if (typeof onSignOut === "function") onSignOut();
   };
 
   return (
-    <header className={styles["saved-plans-header"]}>
-      <div className={styles["saved-plans-container"]}>
-        <div className={styles["saved-plans-inner"]}>
+    <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className={styles["saved-plans-logo"]}>
-            <div className={styles["saved-plans-logoIcon"]}>
-              <span className={styles["saved-plans-logoText"]}>T</span>
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-sm">T</span>
             </div>
-            <span className={styles["saved-plans-logoTitle"]}>TravelGenie</span>
+            <span className="text-xl font-bold text-foreground">TravelGenie</span>
           </div>
 
           {/* Search Bar */}
-          <div className={styles["saved-plans-search"]}>
-            <div className={styles["saved-plans-searchWrapper"]}>
-              <span role="img" aria-label="Search" className={styles["saved-plans-searchIcon"]}>🔍</span>
-              <input
+          <div className="hidden md:flex flex-1 max-w-md mx-8">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
                 placeholder="Search destinations or trip names..."
-                className={styles["saved-plans-searchInput"]}
+                className="pl-10 bg-background border-border focus:ring-primary"
                 onChange={(e) => onSearch?.(e.target.value)}
               />
             </div>
           </div>
 
           {/* Actions */}
-          <div className={styles["saved-plans-actions"]}>
-            <button className={styles["saved-plans-buttonPrimary"]} onClick={handleCreate}>
-              <span role="img" aria-label="Add" className={styles["saved-plans-plusIcon"]}>➕</span>
+          <div className="flex items-center space-x-4">
+            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground" onClick={handleCreate}>
+              <Plus className="w-4 h-4 mr-2" />
               Create New Itinerary
-            </button>
-            <div style={{ position: "relative", display: "inline-block" }}>
-              <button
-                className={styles["saved-plans-dropdownTrigger"]}
-                onClick={toggleDropdown}
-                type="button"
-              >
-                <span role="img" aria-label="User" className={styles["saved-plans-userIcon"]}>👤</span>
-                {userEmail || "Account"}
-              </button>
-              {showDropdown && (
-                <div
-                  style={{
-                    position: "absolute",
-                    right: 0,
-                    top: "100%",
-                    background: "white",
-                    border: "1px solid #ccc",
-                    borderRadius: 4,
-                    minWidth: 120,
-                    zIndex: 10,
-                  }}
-                >
-                  <button
-                    onClick={handleSignOut}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      width: "100%",
-                      background: "none",
-                      border: "none",
-                      padding: "8px 12px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <span role="img" aria-label="Logout" className={styles["saved-plans-logoutIcon"]}>🚪</span>
-                    <span style={{ marginLeft: 8 }}>Sign Out</span>
-                  </button>
-                </div>
-              )}
-            </div>
+            </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-muted-foreground">
+                  <User className="w-4 h-4 mr-2" />
+                  {userEmail || "Account"}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleSignOut}>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>

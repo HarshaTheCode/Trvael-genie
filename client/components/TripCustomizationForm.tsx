@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { TripFormData, TripFormProps } from '../types/tripForm';
-import { BudgetLevel, TravelStyle, AccessibilityOption, TravelPace } from '../types/enums';
+// Removed all shadcn/ui imports. Use standard HTML elements instead.
+import { TripFormData, TripFormProps } from '@/types/tripForm';
+import { BudgetLevel, TravelStyle, AccessibilityOption, TravelPace } from '@/types/enums';
 import {
   formatBudgetLevel,
   formatTravelStyle,
   formatAccessibilityOption,
   formatTravelPace,
-} from '../lib/formatters';
+} from '@/lib/formatters';
 
 const TripCustomizationForm: React.FC<TripFormProps> = ({
   initialData = {},
@@ -23,13 +24,14 @@ const TripCustomizationForm: React.FC<TripFormProps> = ({
     accessibility: initialData.accessibility || AccessibilityOption.NONE,
     pace: initialData.pace || TravelPace.MODERATE,
     customRequirements: initialData.customRequirements || '',
+    // default language required by TripFormData
     language: (initialData.language as any) || 'en',
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof TripFormData, string>>>({});
 
   const handleInputChange = (field: keyof TripFormData, value: any) => {
-    setFormData((prev: any) => ({ ...prev, [field]: value }));
+  setFormData((prev: any) => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -73,163 +75,174 @@ const TripCustomizationForm: React.FC<TripFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Destination */}
-        <div className="space-y-2">
-          <label htmlFor="destination" className="block text-sm font-medium text-gray-700">
-            Destination
-          </label>
-          <input
-            id="destination"
-            placeholder="Enter destination"
-            value={formData.destination}
-            onChange={(e) => handleInputChange('destination', e.target.value)}
-            className={`w-full px-3 py-2 border ${errors.destination ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
-          />
-          {errors.destination && (
-            <p className="text-sm text-red-500">{errors.destination}</p>
-          )}
+    <div className="max-w-4xl mx-auto p-6">
+      <div className="trip-form-container bg-white rounded-lg shadow p-6">
+        <div className="text-center mb-6">
+          <div className="text-3xl font-bold text-gray-900">Customize Your Trip</div>
         </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Trip Details Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Destination */}
+              <div className="space-y-2">
+                <label htmlFor="destination" className="trip-form-label">
+                  Destination
+                </label>
+                <input
+                  id="destination"
+                  placeholder="Enter destination"
+                  value={formData.destination}
+                  onChange={(e) => handleInputChange('destination', e.target.value)}
+                  className={`trip-form-input ${errors.destination ? 'border-red-500' : ''}`}
+                />
+                {errors.destination && (
+                  <p className="text-sm text-red-500">{errors.destination}</p>
+                )}
+              </div>
 
-        {/* Start Date */}
-        <div className="space-y-2">
-          <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
-            Start Date
-          </label>
-          <input
-            id="startDate"
-            type="date"
-            value={formData.startDate}
-            onChange={(e) => handleInputChange('startDate', e.target.value)}
-            className={`w-full px-3 py-2 border ${errors.startDate ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
-          />
-          {errors.startDate && (
-            <p className="text-sm text-red-500">{errors.startDate}</p>
-          )}
-        </div>
+              {/* Start Date */}
+              <div className="space-y-2">
+                <label htmlFor="startDate" className="trip-form-label">
+                  Start Date
+                </label>
+                <input
+                  id="startDate"
+                  type="date"
+                  value={formData.startDate}
+                  onChange={(e) => handleInputChange('startDate', e.target.value)}
+                  className={`trip-form-input ${errors.startDate ? 'border-red-500' : ''}`}
+                />
+                {errors.startDate && (
+                  <p className="text-sm text-red-500">{errors.startDate}</p>
+                )}
+              </div>
 
-        {/* End Date */}
-        <div className="space-y-2">
-          <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">
-            End Date
-          </label>
-          <input
-            id="endDate"
-            type="date"
-            value={formData.endDate}
-            onChange={(e) => handleInputChange('endDate', e.target.value)}
-            className={`w-full px-3 py-2 border ${errors.endDate ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
-          />
-          {errors.endDate && (
-            <p className="text-sm text-red-500">{errors.endDate}</p>
-          )}
-        </div>
+              {/* End Date */}
+              <div className="space-y-2">
+                <label htmlFor="endDate" className="trip-form-label">
+                  End Date
+                </label>
+                <input
+                  id="endDate"
+                  type="date"
+                  value={formData.endDate}
+                  onChange={(e) => handleInputChange('endDate', e.target.value)}
+                  className={`trip-form-input ${errors.endDate ? 'border-red-500' : ''}`}
+                />
+                {errors.endDate && (
+                  <p className="text-sm text-red-500">{errors.endDate}</p>
+                )}
+              </div>
 
-        {/* Travelers */}
-        <div className="space-y-2">
-          <label htmlFor="travelers" className="block text-sm font-medium text-gray-700">
-            Travelers
-          </label>
-          <input
-            id="travelers"
-            placeholder="e.g., 2 adults, 1 child"
-            value={formData.travelers}
-            onChange={(e) => handleInputChange('travelers', e.target.value)}
-            className={`w-full px-3 py-2 border ${errors.travelers ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
-          />
-          {errors.travelers && (
-            <p className="text-sm text-red-500">{errors.travelers}</p>
-          )}
-        </div>
+              {/* Travelers */}
+              <div className="space-y-2">
+                <label htmlFor="travelers" className="trip-form-label">
+                  Travelers
+                </label>
+                <input
+                  id="travelers"
+                  placeholder="e.g., 2 adults, 1 child"
+                  value={formData.travelers}
+                  onChange={(e) => handleInputChange('travelers', e.target.value)}
+                  className={`trip-form-input ${errors.travelers ? 'border-red-500' : ''}`}
+                />
+                {errors.travelers && (
+                  <p className="text-sm text-red-500">{errors.travelers}</p>
+                )}
+              </div>
 
-        {/* Budget */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">Budget</label>
-          <select
-            value={formData.budget}
-            onChange={e => handleInputChange('budget', e.target.value as BudgetLevel)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="" disabled>Select budget</option>
-            {Object.values(BudgetLevel).map((budget) => (
-              <option key={budget} value={budget}>{formatBudgetLevel(budget)}</option>
-            ))}
-          </select>
-        </div>
+              {/* Budget */}
+              <div className="space-y-2">
+                <label className="trip-form-label">Budget</label>
+                <select
+                  value={formData.budget}
+                  onChange={e => handleInputChange('budget', e.target.value as BudgetLevel)}
+                  className="trip-form-input"
+                >
+                  <option value="" disabled>Select budget</option>
+                  {Object.values(BudgetLevel).map((budget) => (
+                    <option key={budget} value={budget}>{formatBudgetLevel(budget)}</option>
+                  ))}
+                </select>
+              </div>
 
-        {/* Travel Style */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">Travel Style</label>
-          <select
-            value={formData.style}
-            onChange={e => handleInputChange('style', e.target.value as TravelStyle)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="" disabled>Select travel style</option>
-            {Object.values(TravelStyle).map((style) => (
-              <option key={style} value={style}>{formatTravelStyle(style)}</option>
-            ))}
-          </select>
-        </div>
+              {/* Travel Style */}
+              <div className="space-y-2">
+                <label className="trip-form-label">Travel Style</label>
+                <select
+                  value={formData.style}
+                  onChange={e => handleInputChange('style', e.target.value as TravelStyle)}
+                  className="trip-form-input"
+                >
+                  <option value="" disabled>Select travel style</option>
+                  {Object.values(TravelStyle).map((style) => (
+                    <option key={style} value={style}>{formatTravelStyle(style)}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
 
-        {/* Accessibility */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">Accessibility</label>
-          <select
-            value={formData.accessibility}
-            onChange={e => handleInputChange('accessibility', e.target.value as AccessibilityOption)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="" disabled>Select accessibility needs</option>
-            {Object.values(AccessibilityOption).map((option) => (
-              <option key={option} value={option}>{formatAccessibilityOption(option)}</option>
-            ))}
-          </select>
-        </div>
+            {/* Preferences Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Accessibility */}
+              <div className="space-y-2">
+                <label className="trip-form-label">Accessibility</label>
+                <select
+                  value={formData.accessibility}
+                  onChange={e => handleInputChange('accessibility', e.target.value as AccessibilityOption)}
+                  className="trip-form-input"
+                >
+                  <option value="" disabled>Select accessibility needs</option>
+                  {Object.values(AccessibilityOption).map((option) => (
+                    <option key={option} value={option}>{formatAccessibilityOption(option)}</option>
+                  ))}
+                </select>
+              </div>
 
-        {/* Travel Pace */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">Travel Pace</label>
-          <select
-            value={formData.pace}
-            onChange={e => handleInputChange('pace', e.target.value as TravelPace)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="" disabled>Select travel pace</option>
-            {Object.values(TravelPace).map((pace) => (
-              <option key={pace} value={pace}>{formatTravelPace(pace)}</option>
-            ))}
-          </select>
+              {/* Travel Pace */}
+              <div className="space-y-2">
+                <label className="trip-form-label">Travel Pace</label>
+                <select
+                  value={formData.pace}
+                  onChange={e => handleInputChange('pace', e.target.value as TravelPace)}
+                  className="trip-form-input"
+                >
+                  <option value="" disabled>Select travel pace</option>
+                  {Object.values(TravelPace).map((pace) => (
+                    <option key={pace} value={pace}>{formatTravelPace(pace)}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Custom Requirements */}
+            <div className="space-y-2">
+              <label htmlFor="customRequirements" className="trip-form-label">
+                Custom Requirements
+              </label>
+              <textarea
+                id="customRequirements"
+                placeholder="Any special requests or preferences..."
+                value={formData.customRequirements}
+                onChange={(e) => handleInputChange('customRequirements', e.target.value)}
+                className="trip-form-input min-h-[100px]"
+                rows={4}
+              />
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex justify-center pt-4">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full md:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+              >
+                {isLoading ? 'Generating...' : 'Generate Itinerary'}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
-
-      {/* Custom Requirements */}
-      <div className="space-y-2">
-        <label htmlFor="customRequirements" className="block text-sm font-medium text-gray-700">
-          Custom Requirements
-        </label>
-        <textarea
-          id="customRequirements"
-          placeholder="Any special requests or preferences..."
-          value={formData.customRequirements}
-          onChange={(e) => handleInputChange('customRequirements', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[100px]"
-          rows={4}
-        />
-      </div>
-
-      {/* Submit Button - Only visible on mobile, on desktop it's in the right sidebar */}
-      <div className="md:hidden flex justify-center pt-4">
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
-        >
-          {isLoading ? 'Generating...' : 'Generate Itinerary'}
-        </button>
-      </div>
-    </form>
   );
 };
 
