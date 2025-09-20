@@ -1,17 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // Removed all shadcn/ui imports. Use standard HTML elements instead.
-import { TripFormData, TripFormProps } from '@/types/tripForm';
-import { BudgetLevel, TravelStyle, AccessibilityOption, TravelPace } from '@/types/enums';
+import { TripFormData, TripFormProps } from '../types/tripForm';
+import { BudgetLevel, TravelStyle, AccessibilityOption, TravelPace } from '../types/enums';
 import {
   formatBudgetLevel,
   formatTravelStyle,
   formatAccessibilityOption,
   formatTravelPace,
-} from '@/lib/formatters';
+} from '../lib/formatters';
 
-const TripCustomizationForm: React.FC<TripFormProps> = ({
+// Extended props to include onChange
+interface ExtendedTripFormProps extends TripFormProps {
+  onChange?: (data: TripFormData) => void;
+}
+
+const TripCustomizationForm: React.FC<ExtendedTripFormProps> = ({
   initialData = {},
   onSubmit,
+  onChange,
   isLoading = false,
 }) => {
   const [formData, setFormData] = useState<TripFormData>({
@@ -30,14 +36,18 @@ const TripCustomizationForm: React.FC<TripFormProps> = ({
 
   const [errors, setErrors] = useState<Partial<Record<keyof TripFormData, string>>>({});
 
+  // Call onChange whenever formData changes
+  useEffect(() => {
+    if (onChange) {
+      onChange(formData);
+    }
+  }, [formData, onChange]);
+
   const handleInputChange = (field: keyof TripFormData, value: any) => {
-  setFormData((prev: any) => ({ ...prev, [field]: value }));
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
-    }
-    if (onFormChange) {
-      onFormChange(field, value);
     }
   };
 
@@ -97,6 +107,7 @@ const TripCustomizationForm: React.FC<TripFormProps> = ({
                   value={formData.destination}
                   onChange={(e) => handleInputChange('destination', e.target.value)}
                   className={`trip-form-input ${errors.destination ? 'border-red-500' : ''}`}
+                  disabled={isLoading}
                 />
                 {errors.destination && (
                   <p className="text-sm text-red-500">{errors.destination}</p>
@@ -114,6 +125,7 @@ const TripCustomizationForm: React.FC<TripFormProps> = ({
                   value={formData.startDate}
                   onChange={(e) => handleInputChange('startDate', e.target.value)}
                   className={`trip-form-input ${errors.startDate ? 'border-red-500' : ''}`}
+                  disabled={isLoading}
                 />
                 {errors.startDate && (
                   <p className="text-sm text-red-500">{errors.startDate}</p>
@@ -131,6 +143,7 @@ const TripCustomizationForm: React.FC<TripFormProps> = ({
                   value={formData.endDate}
                   onChange={(e) => handleInputChange('endDate', e.target.value)}
                   className={`trip-form-input ${errors.endDate ? 'border-red-500' : ''}`}
+                  disabled={isLoading}
                 />
                 {errors.endDate && (
                   <p className="text-sm text-red-500">{errors.endDate}</p>
@@ -148,6 +161,7 @@ const TripCustomizationForm: React.FC<TripFormProps> = ({
                   value={formData.travelers}
                   onChange={(e) => handleInputChange('travelers', e.target.value)}
                   className={`trip-form-input ${errors.travelers ? 'border-red-500' : ''}`}
+                  disabled={isLoading}
                 />
                 {errors.travelers && (
                   <p className="text-sm text-red-500">{errors.travelers}</p>
@@ -161,6 +175,7 @@ const TripCustomizationForm: React.FC<TripFormProps> = ({
                   value={formData.budget}
                   onChange={e => handleInputChange('budget', e.target.value as BudgetLevel)}
                   className="trip-form-input"
+                  disabled={isLoading}
                 >
                   <option value="" disabled>Select budget</option>
                   {Object.values(BudgetLevel).map((budget) => (
@@ -176,6 +191,7 @@ const TripCustomizationForm: React.FC<TripFormProps> = ({
                   value={formData.style}
                   onChange={e => handleInputChange('style', e.target.value as TravelStyle)}
                   className="trip-form-input"
+                  disabled={isLoading}
                 >
                   <option value="" disabled>Select travel style</option>
                   {Object.values(TravelStyle).map((style) => (
@@ -194,6 +210,7 @@ const TripCustomizationForm: React.FC<TripFormProps> = ({
                   value={formData.accessibility}
                   onChange={e => handleInputChange('accessibility', e.target.value as AccessibilityOption)}
                   className="trip-form-input"
+                  disabled={isLoading}
                 >
                   <option value="" disabled>Select accessibility needs</option>
                   {Object.values(AccessibilityOption).map((option) => (
@@ -209,6 +226,7 @@ const TripCustomizationForm: React.FC<TripFormProps> = ({
                   value={formData.pace}
                   onChange={e => handleInputChange('pace', e.target.value as TravelPace)}
                   className="trip-form-input"
+                  disabled={isLoading}
                 >
                   <option value="" disabled>Select travel pace</option>
                   {Object.values(TravelPace).map((pace) => (
@@ -230,13 +248,15 @@ const TripCustomizationForm: React.FC<TripFormProps> = ({
                 onChange={(e) => handleInputChange('customRequirements', e.target.value)}
                 className="trip-form-input min-h-[100px]"
                 rows={4}
+                disabled={isLoading}
               />
             </div>
 
-
-          </form>
-        </div>
+            {/* Submit button for form validation (hidden, handled by external button) */}
+            <button type="submit" style={{ display: 'none' }} />
+        </form>
       </div>
+    </div>
   );
 };
 

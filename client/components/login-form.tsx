@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { toast } from "sonner";
-
 // --- Embedded CSS Styles ---
 const LoginStyles = () => (
   <style>{`

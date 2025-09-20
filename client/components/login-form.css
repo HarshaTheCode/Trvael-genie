@@ -1,211 +1,86 @@
-/* src/global.css - paste exactly (overwrite your existing global.css) */
 
-/* ========== THEME CSS VARIABLES (used by components) ========== */
-:root {
-  --spacing-0: 0px;
-  --spacing-0-5: 0.125rem;
-  --spacing-1: 0.25rem;
-  --spacing-1-5: 0.375rem;
-  --spacing-2: 0.5rem;
-  --spacing-2-5: 0.625rem;
-  --spacing-3: 0.75rem;
-  --spacing-3-5: 0.875rem;
-  --spacing-4: 1rem;
-  --spacing-5: 1.25rem;
-  --spacing-6: 1.5rem;
-  --spacing-7: 1.75rem;
-  --spacing-8: 2rem;
-  --spacing-10: 2.5rem;
-  --spacing-12: 3rem;
-  --spacing-16: 4rem;
-  --spacing-20: 5rem;
-  --spacing-24: 6rem;
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f9fafb;
+      padding: 1rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+    }
 
-  /* radius and color tokens commonly used by shadcn/ui-like kits */
-  --radius: 0.5rem;
-  --background: 0 0% 100%;
-  --foreground: 220 15% 10%;
-  --card: 0 0% 100%;
-  --card-foreground: 220 15% 10%;
-  --primary: 220 80% 50%;
-  --primary-foreground: 0 0% 100%;
-  --border: 0 0% 90%;
-  --input: 0 0% 100%;
-  --ring: 220 80% 60%;
-}
+    .login-container {
+      width: 100%;
+      max-width: 448px;
+      background-color: #ffffff;
+      border-radius: 0.75rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      padding: 2rem;
+      border-top: 4px solid #ea580c;
+    }
 
-/* ========== TAILWIND DIRECTIVES ========== */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+    .login-header { text-align: center; margin-bottom: 2rem; }
+    .login-title { font-size: 1.875rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; }
+    .login-subtitle { color: #4b5563; }
+    
+    .error-message {
+      background-color: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+      border-radius: 0.5rem;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+      text-align: center;
+    }
 
-/* ========== DEBUG BADGE (remove after verifying CSS loads) ========== */
-body::after {
-  content: "TAILWIND-LOADED";
-  position: fixed;
-  bottom: 6px;
-  right: 6px;
-  background: rgba(0,0,0,0.75);
-  color: #fff;
-  padding: 4px 6px;
-  font-size: 11px;
-  border-radius: 4px;
-  z-index: 99999;
-  pointer-events: none;
-}
+    .login-form .form-group { margin-bottom: 1rem; }
+    .login-form .form-label { display: block; color: #374151; font-weight: 500; margin-bottom: 0.5rem; }
+    .input-wrapper { position: relative; }
 
-/* ========== your existing page-specific CSS (login) ========== */
-.login-form-container {
-  max-width: 400px;
-  margin: 0 auto;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  padding: 24px;
-  background: #ffffff;
-}
+    .form-control {
+      width: 100%;
+      padding: 0.75rem 2.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.5rem;
+      color: #374151;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-control:focus { border-color: #ea580c; box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.2); }
 
-.login-form-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 4px;
-}
+    .input-icon { position: absolute; top: 50%; left: 0.75rem; transform: translateY(-50%); display: flex; align-items: center; pointer-events: none; }
+    .input-icon svg { height: 1.25rem; width: 1.25rem; color: #9ca3af; }
 
-.login-form-subtitle {
-  color: #6b7280;
-  margin-bottom: 16px;
-}
+    .toggle-password { position: absolute; top: 50%; right: 0.75rem; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0.25rem; }
+    .toggle-password svg { height: 1.25rem; width: 1.25rem; color: #9ca3af; transition: color 0.2s; }
+    .toggle-password:hover svg { color: #4b5563; }
 
-.error-message {
-  background: #fee2e2;
-  color: #b91c1c;
-  padding: 8px;
-  border-radius: 4px;
-  margin-bottom: 12px;
-  font-size: 14px;
-}
+    .form-options { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; font-size: 0.875rem; }
+    .remember-me { display: flex; align-items: center; }
+    .remember-me input { height: 1rem; width: 1rem; margin-right: 0.5rem; accent-color: #ea580c; }
+    .remember-me label { color: #111827; }
+    .forgot-password-link { color: #ea580c; font-weight: 500; text-decoration: none; }
+    .forgot-password-link:hover, .signup-link a:hover { text-decoration: underline; }
 
-.form-group {
-  margin-bottom: 16px;
-}
+    .btn-submit {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #ffffff;
+      background-color: #ea580c;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      border: none;
+    }
+    .btn-submit:hover { background-color: #c2410c; }
+    .btn-submit:disabled { background-color: #f97316; cursor: not-allowed; }
 
-.form-label {
-  display: block;
-  margin-bottom: 4px;
-  font-weight: 500;
-  color: #374151;
-}
-
-.input-container {
-  position: relative;
-}
-
-.input-icon {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 16px;
-  color: #9ca3af;
-}
-
-.form-input {
-  padding-left: 32px;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  height: 40px;
-  width: 100%;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.form-input:focus {
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-  outline: none;
-}
-
-.password-toggle-btn {
-  position: absolute;
-  right: 0;
-  top: 0;
-  height: 40px;
-  width: 40px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #9ca3af;
-}
-
-.form-options {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.remember-me {
-  display: flex;
-  align-items: center;
-}
-
-.remember-me input[type="checkbox"] {
-  margin-right: 6px;
-}
-
-.remember-me label {
-  font-size: 14px;
-  font-weight: 400;
-  color: #374151;
-}
-
-.forgot-password-link {
-  font-size: 14px;
-  color: #4f46e5;
-  text-decoration: none;
-}
-
-.forgot-password-link:hover {
-  text-decoration: underline;
-}
-
-.submit-btn {
-  width: 100%;
-  background: #4f46e5;
-  color: #ffffff;
-  border: none;
-  border-radius: 4px;
-  padding: 12px 0;
-  font-weight: 600;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.2s ease, opacity 0.2s ease;
-}
-
-.submit-btn:hover {
-  background: #4338ca;
-}
-
-.submit-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-.signup-link-container {
-  text-align: center;
-  font-size: 14px;
-  color: #6b7280;
-  margin-top: 16px;
-}
-
-.signup-link {
-  color: #4f46e5;
-  text-decoration: none;
-}
-
-.signup-link:hover {
-  text-decoration: underline;
-}
+    .signup-link-container { margin-top: 2rem; text-align: center; font-size: 0.875rem; color: #4b5563; }
+    .signup-link-container a { font-weight: 500; color: #ea580c; text-decoration: none; }

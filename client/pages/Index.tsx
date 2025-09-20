@@ -26,6 +26,7 @@ export default function Index() {
   const [generatedItinerary, setGeneratedItinerary] = useState<GenerateItineraryResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<TripFormData | null>(null);
+  const [canGenerate, setCanGenerate] = useState(false);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -48,6 +49,12 @@ export default function Index() {
 
   const handleHistoryItemClick = (itinerary: GenerateItineraryResponse) => {
     setGeneratedItinerary(itinerary);
+  };
+
+  const handleFormChange = (data: TripFormData) => {
+    setFormData(data);
+    // Check if we have minimum required data to generate
+    setCanGenerate(!!data.destination && !!data.startDate && !!data.endDate);
   };
 
   const handleSubmit = async (data: TripFormData) => {
@@ -76,8 +83,13 @@ export default function Index() {
         setGeneratedItinerary(result);
         setHistoryKey(prevKey => prevKey + 1);
       } else {
-        setError(result.error || "Failed to generate itinerary");
-        toast.error(result.error || "Failed to generate itinerary");
+        if (result.error === "LLM_GENERATION_FAILED") {
+          setError("The AI model is currently overloaded. Please try again in a few moments.");
+          toast.error("The AI model is currently overloaded. Please try again in a few moments.");
+        } else {
+          setError(result.error || "Failed to generate itinerary");
+          toast.error(result.error || "Failed to generate itinerary");
+        }
       }
     } catch (err) {
       console.error("Request failed:", err);
@@ -85,6 +97,14 @@ export default function Index() {
       toast.error("Network error. Please check your connection and try again.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGenerateClick = () => {
+    if (formData && canGenerate) {
+      handleSubmit(formData);
+    } else {
+      toast.error("Please fill in all required fields before generating your itinerary.");
     }
   };
 
@@ -105,25 +125,57 @@ export default function Index() {
   return (
     <div className="index-page">
       <aside className="left-sidebar">
-        <div className="sidebar-header"><div className="logo-icon">🗺️</div><span className="logo-text">TravelGenie</span></div>
+        <div className="sidebar-header">
+          <div className="logo-icon">🗺️</div>
+          <span className="logo-text">TravelGenie</span>
+        </div>
         <div className="sidebar-content">
           <nav className="sidebar-nav">
-            <Link to="/index" className="nav-link active"><PlusIcon /> New Trip</Link>
-            <Link to="/saved-plans" className="nav-link"><StarIcon /> My Saved Plans</Link>
+            <Link to="/index" className="nav-link active">
+              <PlusIcon /> New Trip
+            </Link>
+            {isAuthenticated && (
+              <Link to="/saved-plans" className="nav-link">
+                <StarIcon /> My Saved Plans
+              </Link>
+            )}
           </nav>
-          <div className="history-section">
-            <h3>History</h3>
-            <div className="history-list">
-              {history.map((item) => (
-                <div key={item.id} className="history-item" onClick={() => handleHistoryItemClick({ success: true, itinerary: item.itinerary_data, itineraryId: item.id })}>
-                  <span>{item.itinerary_data.title || item.itinerary_data.meta.destination || 'Unknown Trip'}</span>
-                </div>
-              ))}
+          {isAuthenticated && (
+            <div className="history-section">
+              <h3>History</h3>
+              <div className="history-list">
+                {history.map((item) => (
+                  <div 
+                    key={item.id} 
+                    className="history-item" 
+                    onClick={() => handleHistoryItemClick({ 
+                      success: true, 
+                      itinerary: item.itinerary_data, 
+                      itineraryId: item.id 
+                    })}
+                  >
+                    <span>
+                      {item.itinerary_data.title || 
+                       item.itinerary_data.meta?.destination || 
+                       'Unknown Trip'}
+                    </span>
+                  </div>
+                ))}
+                {history.length === 0 && (
+                  <div className="no-history">
+                    <p>No previous trips yet</p>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
         <div className="sidebar-footer">
-          <button className="generate-button" type="submit" form="trip-customization-form" disabled={isLoading}>
+          <button 
+            className={`generate-button ${!canGenerate || isLoading ? 'disabled' : ''}`}
+            onClick={handleGenerateClick}
+            disabled={!canGenerate || isLoading}
+          >
             {isLoading ? "Generating..." : "Generate Itinerary"}
           </button>
         </div>
@@ -131,11 +183,18 @@ export default function Index() {
       <main className="main-content">
         <div className="main-content-inner">
           <h1 className="main-title">Customize Your Trip</h1>
-          <p className="main-subtitle">Tell us about your dream trip. Fill in the details below to generate a personalized itinerary.</p>
+          <p className="main-subtitle">
+            Tell us about your dream trip. Fill in the details below to generate a personalized itinerary.
+          </p>
+          {error && (
+            <div className="error-message-container">
+              <p className="error-message">{error}</p>
+            </div>
+          )}
           <div className="form-wrapper">
             <TripCustomizationForm
-              id="trip-customization-form"
               onSubmit={handleSubmit}
+              onChange={handleFormChange}
               isLoading={isLoading}
               initialData={formData || undefined}
             />
