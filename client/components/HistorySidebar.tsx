@@ -89,7 +89,7 @@ export function HistorySidebar({ onHistoryItemClick }: HistorySidebarProps) {
         <ul>
           {history.map((item) => (
             <li key={item.id} onClick={() => handleItemClick(item)} className="mb-2 p-2 border rounded-md hover:bg-gray-100 cursor-pointer">
-              <div>{item.itinerary_data.meta.destination}</div>
+              <div>{item.itinerary_data.destination}</div>
               <div className="text-sm text-gray-500">
                 {new Date(item.created_at).toLocaleString()}
               </div>

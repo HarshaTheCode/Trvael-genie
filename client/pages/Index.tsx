@@ -1,26 +1,50 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Compass, History, Save, User } from "lucide-react";
-import { GenerateItineraryResponse } from "../../shared/api";
-import { HistorySidebar } from "../components/HistorySidebar";
+import { toast } from "sonner";
+import { useAuth, useAuthenticatedFetch } from "../contexts/AuthContext";
+import { GenerateItineraryResponse, ItineraryResponse } from "../../shared/api";
 import { ItineraryDisplay } from "../components/ItineraryDisplay";
 import TripCustomizationForm from "../components/TripCustomizationForm";
 import { TripFormData } from "../types/tripForm";
-import { useAuth, useAuthenticatedFetch } from "../contexts/AuthContext";
-import { toast } from "sonner";
-import './Index.css';
+import "./Index.css";
+
+const PlusIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>;
+const StarIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
+
+interface HistoryItem {
+  id: string;
+  itinerary_data: ItineraryResponse;
+  created_at: string;
+}
 
 export default function Index() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
   const authenticatedFetch = useAuthenticatedFetch();
-  const [showHistory, setShowHistory] = useState(false);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
   const [historyKey, setHistoryKey] = useState(0);
-
   const [isLoading, setIsLoading] = useState(false);
-  const [generatedItinerary, setGeneratedItinerary] =
-    useState<GenerateItineraryResponse | null>(null);
+  const [generatedItinerary, setGeneratedItinerary] = useState<GenerateItineraryResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<TripFormData | null>(null);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      if (!isAuthenticated) return;
+      try {
+        const response = await authenticatedFetch('/api/history');
+        const data = await response.json();
+        if (data.success) {
+          setHistory(data.history);
+        } else {
+          toast.error('Failed to load history');
+        }
+      } catch (error) {
+        toast.error('Failed to load history');
+      }
+    };
+
+    fetchHistory();
+  }, [authenticatedFetch, isAuthenticated, historyKey]);
 
   const handleHistoryItemClick = (itinerary: GenerateItineraryResponse) => {
     setGeneratedItinerary(itinerary);
@@ -40,8 +64,7 @@ export default function Index() {
 
       if (!response.ok) {
         const errorResult = await response.json().catch(() => null);
-        const errorMessage =
-          errorResult?.error || `Server error (${response.status})`;
+        const errorMessage = errorResult?.error || `Server error (${response.status})`;
         setError(errorMessage);
         toast.error(errorMessage);
         return;
@@ -51,15 +74,10 @@ export default function Index() {
 
       if (result.success && result.itinerary) {
         setGeneratedItinerary(result);
-        setHistoryKey(prevKey => prevKey + 1); // Triggers history refresh
+        setHistoryKey(prevKey => prevKey + 1);
       } else {
-        if (result.error === "LLM_GENERATION_FAILED") {
-          setError("The AI model is currently overloaded. Please try again in a few moments.");
-          toast.error("The AI model is currently overloaded. Please try again in a few moments.");
-        } else {
-          setError(result.error || "Failed to generate itinerary");
-          toast.error(result.error || "Failed to generate itinerary");
-        }
+        setError(result.error || "Failed to generate itinerary");
+        toast.error(result.error || "Failed to generate itinerary");
       }
     } catch (err) {
       console.error("Request failed:", err);
@@ -85,118 +103,45 @@ export default function Index() {
   }
 
   return (
-    <div className="index-page-container">
-      <div className="sidebar">
-        <div className="sidebar-header">
-          <Compass className="sidebar-logo" />
-          <h1 className="sidebar-title">TravelGenie</h1>
-        </div>
-        
+    <div className="index-page">
+      <aside className="left-sidebar">
+        <div className="sidebar-header"><div className="logo-icon">🗺️</div><span className="logo-text">TravelGenie</span></div>
         <div className="sidebar-content">
-          <div className="trip-details-section">
-            <h2 className="trip-details-title">Trip Details</h2>
-            <div className="trip-details-info">
-              <p>Destination: {formData?.destination || 'Not set'}</p>
-              <p>Dates: {formData?.startDate ? `${formData.startDate} to ${formData.endDate}` : 'Not set'}</p>
-              <p>Travelers: {formData?.travelers || 'Not set'}</p>
+          <nav className="sidebar-nav">
+            <Link to="/index" className="nav-link active"><PlusIcon /> New Trip</Link>
+            <Link to="/saved-plans" className="nav-link"><StarIcon /> My Saved Plans</Link>
+          </nav>
+          <div className="history-section">
+            <h3>History</h3>
+            <div className="history-list">
+              {history.map((item) => (
+                <div key={item.id} className="history-item" onClick={() => handleHistoryItemClick({ success: true, itinerary: item.itinerary_data, itineraryId: item.id })}>
+                  <span>{item.itinerary_data.title || item.itinerary_data.meta.destination || 'Unknown Trip'}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
-        
         <div className="sidebar-footer">
-          {isAuthenticated ? (
-            <>
-              <Link to="/saved-plans">
-                <button className="sidebar-btn">
-                  <Save className="h-5 w-5" />
-                  <span>Saved Plans</span>
-                </button>
-              </Link>
-              <button 
-                onClick={() => setShowHistory(!showHistory)}
-                className="sidebar-btn"
-              >
-                <History className="h-5 w-5" />
-                <span>History</span>
-              </button>
-              <button 
-                onClick={logout}
-                className="sidebar-btn"
-              >
-                <User className="h-5 w-5" />
-                <span>Logout</span>
-              </button>
-            </>
-          ) : (
-            <>
-              <Link to="/login">
-                <button className="sidebar-btn">Login</button>
-              </Link>
-              <Link to="/signup">
-                <button className="sidebar-btn">Sign Up</button>
-              </Link>
-            </>
-          )}
-        </div>
-      </div>
-
-      <div className="main-content">
-        <div className="main-content-container">
-          <div className="main-header">
-            <h1 className="main-title">Customize Your Trip</h1>
-            <p className="main-subtitle">We'll generate your perfect itinerary based on your preferences</p>
-          </div>
-          
-          <div className="form-container">
-            <TripCustomizationForm onSubmit={handleSubmit} isLoading={isLoading} />
-          </div>
-          
-          {error && (
-            <div className="error-message-container">
-              {error}
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="preview-panel">
-        <h2 className="preview-title">Quick Preview</h2>
-        <div className="preview-section">
-          <div className="preview-item">
-            <h3>Destination</h3>
-            <p>{formData?.destination || 'Not selected yet'}</p>
-          </div>
-          <div className="preview-item">
-            <h3>Style</h3>
-            <p>{formData?.style || 'Not selected yet'}</p>
-          </div>
-          <div className="preview-item">
-            <h3>Budget</h3>
-            <p>{formData?.budget || 'Not selected yet'}</p>
-          </div>
-          <div className="preview-item">
-            <h3>Pace</h3>
-            <p>{formData?.pace || 'Not selected yet'}</p>
-          </div>
-        </div>
-        
-        <div className="generate-btn-container">
-          <button 
-            className="generate-btn"
-            onClick={() => handleSubmit(formData || {} as TripFormData)}
-            disabled={!formData?.destination || isLoading}
-          >
-            {isLoading ? 'Generating...' : 'Generate Itinerary'}
+          <button className="generate-button" type="submit" form="trip-customization-form" disabled={isLoading}>
+            {isLoading ? "Generating..." : "Generate Itinerary"}
           </button>
         </div>
-      </div>
-
-      {isAuthenticated && showHistory && (
-        <div className="history-overlay">
-          <div className="history-overlay-backdrop" onClick={() => setShowHistory(false)}></div>
-          <HistorySidebar key={historyKey} onHistoryItemClick={handleHistoryItemClick} />
+      </aside>
+      <main className="main-content">
+        <div className="main-content-inner">
+          <h1 className="main-title">Customize Your Trip</h1>
+          <p className="main-subtitle">Tell us about your dream trip. Fill in the details below to generate a personalized itinerary.</p>
+          <div className="form-wrapper">
+            <TripCustomizationForm
+              id="trip-customization-form"
+              onSubmit={handleSubmit}
+              isLoading={isLoading}
+              initialData={formData || undefined}
+            />
+          </div>
         </div>
-      )}
+      </main>
     </div>
   );
 }

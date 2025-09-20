@@ -203,3 +203,4 @@ export default function Login() {
   );
 }
 
+hey ai we have the /index page now i replaced the code of its with nice ui now you have to tigrate it with the backend code hear is you need to do with in the ui intigration 1. the generation of itenery has to be done by ai not by any demo it was shwoing some andome data on th eclick it has to send the api call we have alredy build redy backned there2. the history has to be coem by our data base not any    randome3. the saved plnes has to redirect the actual page of svaed plne page now you need to fix this intigration task with out braking any      │exising functiionilitys

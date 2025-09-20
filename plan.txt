@@ -1,0 +1,117 @@
+{
+  "days": [
+    {
+      "day": 1,
+      "date": "2025-09-16",
+      "segments": [
+        {
+          "food": "Irani Chai and Osmania Biscuits",
+          "note": "Iconic landmark of hyderabad",
+          "time": "09:00",
+          "place": "Charminar",
+          "duration_min": 90,
+          "transport_min_to_next": 15
+        },
+        {
+          "food": "Biryani from Paradise Restaurant",
+          "note": "Historic mosque near Charminar",
+          "time": "10:45",
+          "place": "Mecca Masjid",
+          "duration_min": 60,
+          "transport_min_to_next": 20
+        },
+        {
+          "food": "Hyderabadi Haleem",
+          "note": "Former residence of the Nizams",
+          "time": "12:05",
+          "place": "Chowmahalla Palace",
+          "duration_min": 75,
+          "transport_min_to_next": 10
+        },
+        {
+          "food": "Local street food near the museum",
+          "note": "Vast collection of artifacts",
+          "time": "13:20",
+          "place": "Salar Jung Museum",
+          "duration_min": 120,
+          "transport_min_to_next": 30
+        },
+        {
+          "food": "Snacks from a local vendor",
+          "note": "Traditional bangles and jewelry market",
+          "time": "15:50",
+          "place": "Laad Bazaar",
+          "duration_min": 60,
+          "transport_min_to_next": 0
+        }
+      ],
+      "daily_tip": "Use auto-rickshaws for short distances"
+    },
+    {
+      "day": 2,
+      "date": "2025-09-17",
+      "segments": [
+        {
+          "food": "Breakfast at a local cafe",
+          "note": "Impressive historical fort",
+          "time": "09:00",
+          "place": "Golconda Fort",
+          "duration_min": 120,
+          "transport_min_to_next": 25
+        },
+        {
+          "food": "Lunch at a restaurant near the tombs",
+          "note": "Elegant tombs of Qutb Shahi rulers",
+          "time": "11:05",
+          "place": "Qutb Shahi Tombs",
+          "duration_min": 90,
+          "transport_min_to_next": 20
+        },
+        {
+          "food": "Street food near Hussain Sagar",
+          "note": "Relaxing boat ride and Buddha statue",
+          "time": "12:35",
+          "place": "Hussain Sagar Lake",
+          "duration_min": 60,
+          "transport_min_to_next": 15
+        },
+        {
+          "food": "Evening snacks near the temple",
+          "note": "Stunning white marble temple",
+          "time": "13:55",
+          "place": "Birla Mandir",
+          "duration_min": 45,
+          "transport_min_to_next": 30
+        },
+        {
+          "food": "Dinner at Ramoji Film City",
+          "note": "One of the largest film studios",
+          "time": "14:40",
+          "place": "Ramoji Film City",
+          "duration_min": 120,
+          "transport_min_to_next": 0
+        }
+      ],
+      "daily_tip": "Negotiate auto-rickshaw fares beforehand"
+    }
+  ],
+  "meta": {
+    "style": "culture",
+    "budget": "medium",
+    "end_date": "2025-09-17",
+    "travelers": "2 adults",
+    "start_date": "2025-09-16",
+    "destination": "hyderabad, India"
+  },
+  "title": "2-day hyderabad Culture Tour",
+  "generated_at": "2023-10-27T16:30:00Z",
+  "source_facts": [
+    "hyderabad is known for its rich history and culture",
+    "hyderabad offers a blend of Mughal and South Indian architecture"
+  ],
+  "budget_estimate": {
+    "low": 6000,
+    "high": 18000,
+    "median": 10000
+  }
+}

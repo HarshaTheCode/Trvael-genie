@@ -449,7 +449,7 @@ export class SupabaseService {
     try {
       const { data, error } = await supabase
         .from('search_history')
-        .select('*')
+        .select('id, itinerary_data')
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
 

@@ -36,6 +36,9 @@ const TripCustomizationForm: React.FC<TripFormProps> = ({
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
+    if (onFormChange) {
+      onFormChange(field, value);
+    }
   };
 
   const validateForm = (): boolean => {
@@ -230,16 +233,7 @@ const TripCustomizationForm: React.FC<TripFormProps> = ({
               />
             </div>
 
-            {/* Submit Button */}
-            <div className="flex justify-center pt-4">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full md:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
-              >
-                {isLoading ? 'Generating...' : 'Generate Itinerary'}
-              </button>
-            </div>
+
           </form>
         </div>
       </div>
