@@ -1,7 +1,5 @@
-import { Card, CardContent } from "./ui/card";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
-import { Calendar, MapPin, Users, Eye, Share2, Trash2, Heart, Plus } from "lucide-react";
+import React from "react";
+import { MapPin, Calendar, Users, Eye, Share2, Trash2, Heart, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export type Itinerary = any;
@@ -37,147 +35,481 @@ export function SavedPlansGrid({
     if (onShare) {
       onShare(item.id);
     } else {
-      // Default share behavior
       console.log("Share item:", item);
     }
   };
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground text-balance">My Saved Plans</h1>
-            <p className="text-muted-foreground mt-1">Loading...</p>
+      <>
+        <style>
+          {`
+            .loading-container {
+              flex: 1;
+            }
+            
+            .loading-header {
+              margin-bottom: 32px;
+            }
+            
+            .loading-title {
+              font-size: 28px;
+              font-weight: bold;
+              color: #111827;
+              margin-bottom: 8px;
+            }
+            
+            .loading-subtitle {
+              color: #6b7280;
+            }
+            
+            .loading-grid {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+              gap: 24px;
+            }
+            
+            .loading-card {
+              background: white;
+              border-radius: 16px;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+              overflow: hidden;
+            }
+            
+            .loading-image {
+              height: 200px;
+              background: #f3f4f6;
+              animation: pulse 2s infinite;
+            }
+            
+            .loading-content {
+              padding: 24px;
+            }
+            
+            .loading-bar {
+              background: #f3f4f6;
+              border-radius: 4px;
+              animation: pulse 2s infinite;
+              margin-bottom: 12px;
+            }
+            
+            .loading-bar.title { height: 24px; }
+            .loading-bar.subtitle { height: 16px; width: 75%; }
+            .loading-bar.info { height: 16px; width: 90%; }
+            
+            @keyframes pulse {
+              0%, 100% { opacity: 1; }
+              50% { opacity: 0.5; }
+            }
+          `}
+        </style>
+        
+        <div className="loading-container">
+          <div className="loading-header">
+            <h1 className="loading-title">My Saved Plans</h1>
+            <p className="loading-subtitle">Loading...</p>
+          </div>
+          <div className="loading-grid">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="loading-card">
+                <div className="loading-image" />
+                <div className="loading-content">
+                  <div className="loading-bar title" />
+                  <div className="loading-bar subtitle" />
+                  <div className="loading-bar info" />
+                  <div className="loading-bar info" />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {[1, 2, 3].map((i) => (
-            <Card key={i} className="overflow-hidden border-0 shadow-lg">
-              <div className="h-48 bg-muted animate-pulse" />
-              <CardContent className="p-6 space-y-4">
-                <div className="h-6 bg-muted animate-pulse rounded" />
-                <div className="h-4 bg-muted animate-pulse rounded w-3/4" />
-                <div className="space-y-2">
-                  <div className="h-4 bg-muted animate-pulse rounded" />
-                  <div className="h-4 bg-muted animate-pulse rounded" />
-                  <div className="h-4 bg-muted animate-pulse rounded" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground text-balance">My Saved Plans</h1>
-          <p className="text-muted-foreground mt-1">{itineraries.length} saved itineraries</p>
+    <>
+      <style>
+        {`
+          .grid-container {
+            flex: 1;
+          }
+          
+          .grid-header {
+            margin-bottom: 32px;
+          }
+          
+          .grid-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #111827;
+            margin-bottom: 8px;
+          }
+          
+          .grid-subtitle {
+            color: #6b7280;
+            font-size: 16px;
+          }
+          
+          .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+          }
+          
+          .plan-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+          }
+          
+          .plan-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+          }
+          
+          .card-image-container {
+            position: relative;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+          }
+          
+          .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+          }
+          
+          .plan-card:hover .card-image {
+            transform: scale(1.05);
+          }
+          
+          .card-badges {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+          }
+          
+          .trip-type-badge {
+            background: rgba(8, 145, 178, 0.9);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: capitalize;
+          }
+          
+          .favorite-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+          }
+          
+          .favorite-btn:hover {
+            background: white;
+          }
+          
+          .favorite-icon {
+            width: 18px;
+            height: 18px;
+            color: #6b7280;
+            transition: color 0.2s;
+          }
+          
+          .favorite-icon.active {
+            color: #ef4444;
+            fill: currentColor;
+          }
+          
+          .card-content {
+            padding: 24px;
+          }
+          
+          .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+            line-height: 1.3;
+          }
+          
+          .card-description {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 16px;
+            line-height: 1.4;
+          }
+          
+          .card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+          }
+          
+          .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6b7280;
+            font-size: 14px;
+          }
+          
+          .info-icon {
+            width: 16px;
+            height: 16px;
+            color: #0891b2;
+          }
+          
+          .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid #f3f4f6;
+          }
+          
+          .duration-badge {
+            background: #f3f4f6;
+            color: #6b7280;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+          }
+          
+          .card-actions {
+            display: flex;
+            gap: 4px;
+          }
+          
+          .action-btn {
+            background: none;
+            border: none;
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+          }
+          
+          .action-btn:hover {
+            background: #f3f4f6;
+          }
+          
+          .action-btn.view:hover,
+          .action-btn.share:hover {
+            background: rgba(8, 145, 178, 0.1);
+            color: #0891b2;
+          }
+          
+          .action-btn.delete:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+          }
+          
+          .action-icon {
+            width: 16px;
+            height: 16px;
+          }
+          
+          .empty-state {
+            text-align: center;
+            padding: 64px 24px;
+          }
+          
+          .empty-icon {
+            width: 64px;
+            height: 64px;
+            background: #f3f4f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+          }
+          
+          .empty-icon svg {
+            width: 32px;
+            height: 32px;
+            color: #9ca3af;
+          }
+          
+          .empty-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+          }
+          
+          .empty-description {
+            color: #6b7280;
+            margin-bottom: 24px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+          }
+          
+          .empty-button {
+            background: #0891b2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+          }
+          
+          .empty-button:hover {
+            background: #0e7490;
+          }
+          
+          @media (max-width: 768px) {
+            .plans-grid {
+              grid-template-columns: 1fr;
+              gap: 16px;
+            }
+            
+            .grid-title {
+              font-size: 24px;
+            }
+            
+            .card-content {
+              padding: 20px;
+            }
+          }
+        `}
+      </style>
+      
+      <div className="grid-container">
+        <div className="grid-header">
+          <h1 className="grid-title">My Saved Plans</h1>
+          <p className="grid-subtitle">{itineraries.length} saved itineraries</p>
         </div>
-      </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {itineraries.map((plan) => (
-          <Card
-            key={plan.id}
-            className="group hover:shadow-lg transition-all duration-300 bg-card border-border overflow-hidden"
-          >
-            <div className="relative">
-              <img
-                src={plan.heroImage || plan.image || "/placeholder.svg"}
-                alt={plan.title || plan.itinerary?.title}
-                className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-              <div className="absolute top-3 right-3">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className={`bg-white/90 hover:bg-white ${plan.isFavorite ? "text-red-500" : "text-gray-500"}`}
-                  onClick={() => onToggleFavorite?.(plan.id, plan.isFavorite)}
-                >
-                  <Heart className={`w-4 h-4 ${plan.isFavorite ? "fill-current" : ""}`} />
-                </Button>
+        <div className="plans-grid">
+          {itineraries.map((plan) => (
+            <div key={plan.id} className="plan-card" onClick={() => handleView(plan.id)}>
+              <div className="card-image-container">
+                <div className="card-image" />
+                <div className="card-badges">
+                  <div className="trip-type-badge">
+                    {plan.style || plan.itinerary?.meta?.style || "Travel"}
+                  </div>
+                  <button 
+                    className="favorite-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleFavorite?.(plan.id, plan.isFavorite);
+                    }}
+                  >
+                    <Heart className={`favorite-icon ${plan.isFavorite ? 'active' : ''}`} />
+                  </button>
+                </div>
               </div>
-              <div className="absolute top-3 left-3">
-                <Badge variant="secondary" className="bg-primary text-primary-foreground">
-                  {plan.style || plan.itinerary?.meta?.style || "Travel"}
-                </Badge>
-              </div>
-            </div>
 
-            <CardContent className="p-6 space-y-4">
-              <div>
-                <h3 className="text-xl font-semibold text-card-foreground text-balance group-hover:text-primary transition-colors">
+              <div className="card-content">
+                <h3 className="card-title">
                   {plan.title || plan.itinerary?.title}
                 </h3>
-                <p className="text-sm text-muted-foreground mt-1 text-pretty">
+                <p className="card-description">
                   {plan.description || plan.itinerary?.meta?.destination}
                 </p>
-              </div>
 
-              <div className="space-y-2">
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <MapPin className="w-4 h-4 mr-2 text-primary" />
-                  {plan.destination || plan.itinerary?.meta?.destination}
+                <div className="card-info">
+                  <div className="info-item">
+                    <MapPin className="info-icon" />
+                    {plan.destination || plan.itinerary?.meta?.destination}
+                  </div>
+                  <div className="info-item">
+                    <Calendar className="info-icon" />
+                    {plan.dates || `${plan.itinerary?.meta?.start_date} - ${plan.itinerary?.meta?.end_date}`}
+                  </div>
+                  <div className="info-item">
+                    <Users className="info-icon" />
+                    {plan.travelers || plan.itinerary?.meta?.travelers} {(plan.travelers === 1 || plan.itinerary?.meta?.travelers === 1) ? "traveler" : "travelers"}
+                  </div>
                 </div>
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <Calendar className="w-4 h-4 mr-2 text-primary" />
-                  {plan.dates || `${plan.itinerary?.meta?.start_date} - ${plan.itinerary?.meta?.end_date}`}
-                </div>
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <Users className="w-4 h-4 mr-2 text-primary" />
-                  {plan.travelers || plan.itinerary?.meta?.travelers} {plan.travelers === 1 || plan.itinerary?.meta?.travelers === 1 ? "traveler" : "travelers"}
+
+                <div className="card-footer">
+                  <div className="duration-badge">
+                    {plan.duration || `${plan.itinerary?.days?.length || 0} days`}
+                  </div>
+                  <div className="card-actions">
+                    <button 
+                      className="action-btn view" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleView(plan.id);
+                      }}
+                    >
+                      <Eye className="action-icon" />
+                    </button>
+                    <button 
+                      className="action-btn share" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleShare(plan);
+                      }}
+                    >
+                      <Share2 className="action-icon" />
+                    </button>
+                    <button 
+                      className="action-btn delete" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete?.(plan.id);
+                      }}
+                    >
+                      <Trash2 className="action-icon" />
+                    </button>
+                  </div>
                 </div>
               </div>
-
-              <div className="flex items-center justify-between pt-4 border-t border-border">
-                <Badge variant="outline" className="text-xs">
-                  {plan.duration || `${plan.itinerary?.days?.length || 0} days`}
-                </Badge>
-                <div className="flex items-center space-x-2">
-                  <Button size="sm" variant="ghost" className="text-primary hover:text-primary hover:bg-primary/10" onClick={() => handleView(plan.id)}>
-                    <Eye className="w-4 h-4" />
-                  </Button>
-                  <Button size="sm" variant="ghost" className="text-primary hover:text-primary hover:bg-primary/10" onClick={() => handleShare(plan)}>
-                    <Share2 className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                    onClick={() => onDelete?.(plan.id)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Empty State (if no plans) */}
-      {itineraries.length === 0 && (
-        <div className="text-center py-12">
-          <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-            <MapPin className="w-12 h-12 text-muted-foreground" />
-          </div>
-          <h3 className="text-xl font-semibold text-foreground mb-2">No saved plans yet</h3>
-          <p className="text-muted-foreground mb-6 text-pretty">
-            Start planning your next adventure and save your itineraries here.
-          </p>
-          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground" onClick={() => navigate("/")}>
-            <Plus className="w-4 h-4 mr-2" />
-            Create Your First Plan
-          </Button>
+            </div>
+          ))}
         </div>
-      )}
-    </div>
+
+        {itineraries.length === 0 && (
+          <div className="empty-state">
+            <div className="empty-icon">
+              <MapPin />
+            </div>
+            <h3 className="empty-title">No saved plans yet</h3>
+            <p className="empty-description">
+              Start planning your next adventure and save your itineraries here.
+            </p>
+            <button className="empty-button" onClick={() => navigate("/")}>
+              <Plus size={16} />
+              Create Your First Plan
+            </button>
+          </div>
+        )}
+      </div>
+    </>
   );
 }

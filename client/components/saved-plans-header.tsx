@@ -1,9 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 import { Plus, Search, User, LogOut } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 
 interface SavedPlansHeaderProps {
   userEmail?: string;
@@ -14,12 +11,13 @@ interface SavedPlansHeaderProps {
 
 function SavedPlansHeader({ userEmail, onSearch, onCreate, onSignOut }: SavedPlansHeaderProps) {
   const navigate = useNavigate();
+  
   const handleCreate = () => {
     if (typeof onCreate === "function") {
       onCreate();
       return;
     }
-    navigate("/");
+    navigate("/index");
   };
 
   const handleSignOut = () => {
@@ -27,54 +25,203 @@ function SavedPlansHeader({ userEmail, onSearch, onCreate, onSignOut }: SavedPla
   };
 
   return (
-    <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">T</span>
-            </div>
-            <span className="text-xl font-bold text-foreground">TravelGenie</span>
+    <>
+      <style>
+        {`
+          .header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            padding: 16px 0;
+          }
+          
+          .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          }
+          
+          .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+          }
+          
+          .logo {
+            width: 32px;
+            height: 32px;
+            background: #0891b2;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+          }
+          
+          .brand-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #111827;
+          }
+          
+          .search-container {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 32px;
+            position: relative;
+          }
+          
+          .search-input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+          }
+          
+          .search-input:focus {
+            border-color: #0891b2;
+            box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+          }
+          
+          .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            width: 16px;
+            height: 16px;
+          }
+          
+          .actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+          }
+          
+          .create-btn {
+            background: #0891b2;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: background-color 0.2s;
+          }
+          
+          .create-btn:hover {
+            background: #0e7490;
+          }
+          
+          .user-dropdown {
+            position: relative;
+          }
+          
+          .user-btn {
+            background: none;
+            border: none;
+            color: #6b7280;
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+          }
+          
+          .user-btn:hover {
+            background: #f3f4f6;
+          }
+          
+          .dropdown-content {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            min-width: 160px;
+            z-index: 100;
+          }
+          
+          .dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #374151;
+            transition: background-color 0.2s;
+          }
+          
+          .dropdown-item:hover {
+            background: #f3f4f6;
+          }
+          
+          @media (max-width: 768px) {
+            .search-container {
+              display: none;
+            }
+            
+            .header-container {
+              padding: 0 16px;
+            }
+          }
+        `}
+      </style>
+      
+      <header className="header">
+        <div className="header-container">
+          <div className="logo-section">
+            <div className="logo">T</div>
+            <span className="brand-name">TravelGenie</span>
           </div>
 
-          {/* Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-md mx-8">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Search destinations or trip names..."
-                className="pl-10 bg-background border-border focus:ring-primary"
-                onChange={(e) => onSearch?.(e.target.value)}
-              />
-            </div>
+          <div className="search-container">
+            <Search className="search-icon" />
+            <input
+              type="text"
+              placeholder="Search destinations or trip names..."
+              className="search-input"
+              onChange={(e) => onSearch?.(e.target.value)}
+            />
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center space-x-4">
-            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground" onClick={handleCreate}>
-              <Plus className="w-4 h-4 mr-2" />
+          <div className="actions">
+            <button className="create-btn" onClick={handleCreate}>
+              <Plus size={16} />
               Create New Itinerary
-            </Button>
+            </button>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-muted-foreground">
-                  <User className="w-4 h-4 mr-2" />
-                  {userEmail || "Account"}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleSignOut}>
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Sign Out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="user-dropdown">
+              <button className="user-btn">
+                <User size={16} />
+                {userEmail || "harsha01092004@gmail.com"}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </>
   );
 }
 
