@@ -1,74 +1,18 @@
-
-7:37:15 pm [vite] Internal server error: [postcss] It looks like you're trying to use `tailwindcss` directly as a PostCSS plugin. The PostCSS plugin has moved to a separate package, so to continue using Tailwind CSS with PostCSS you'll need to install `@tailwindcss/postcss` and update your PostCSS configuration.
-  Plugin: vite:css
-  File: C:/Harsha space/Where should i  store/clone of the web app/New folder2345/Travel-builder/client/pages/Index.css:undefined:NaN
-      at We (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\tailwindcss@4.1.13\node_modules\tailwindcss\dist\lib.js:35:2121)
-      at LazyResult.runOnRoot (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:361:16)
-      at LazyResult.runAsync (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:290:26)
-      at LazyResult.async (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:192:30)
-      at LazyResult.then (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:436:17)
-7:37:15 pm [vite] Internal server error: [postcss] It looks like you're trying to use `tailwindcss` directly as a PostCSS plugin. The PostCSS plugin has moved to a separate package, so to continue using Tailwind CSS with PostCSS you'll need to install `@tailwindcss/postcss` and update your PostCSS configuration.
-  Plugin: vite:css
-  File: C:/Harsha space/Where should i  store/clone of the web app/New folder2345/Travel-builder/client/pages/SignUp.css:undefined:NaN
-      at We (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\tailwindcss@4.1.13\node_modules\tailwindcss\dist\lib.js:35:2121)
-      at LazyResult.runOnRoot (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:361:16)
-      at LazyResult.runAsync (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:290:26)
-      at LazyResult.async (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:192:30)
-      at LazyResult.then (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:436:17)
-7:37:15 pm [vite] (client) Pre-transform error: [postcss] It looks like you're trying to use `tailwindcss` directly as a PostCSS plugin. The PostCSS plugin has moved to a separate package, so to continue using Tailwind CSS with PostCSS you'll need to install `@tailwindcss/postcss` and update your PostCSS configuration.
-  Plugin: vite:css
-  File: C:/Harsha space/Where should i  store/clone of the web app/New folder2345/Travel-builder/client/pages/Index.css:undefined:NaN
-7:37:15 pm [vite] (client) Pre-transform error: [postcss] It looks like you're trying to use `tailwindcss` directly as a PostCSS plugin. The PostCSS plugin has moved to a separate package, so to continue using Tailwind CSS with PostCSS you'll need to install `@tailwindcss/postcss` and update your PostCSS configuration.
-  Plugin: vite:css
-  File: C:/Harsha space/Where should i  store/clone of the web app/New folder2345/Travel-builder/client/pages/SignUp.css:undefined:NaN
-7:37:15 pm [vite] (client) Pre-transform error: [postcss] It looks like you're trying to use `tailwindcss` directly as a PostCSS plugin. The PostCSS plugin has moved to a separate package, so to continue using Tailwind CSS with PostCSS you'll need to install `@tailwindcss/postcss` and update your PostCSS configuration.
-  Plugin: vite:css
-  File: C:/Harsha space/Where should i  store/clone of the web app/New folder2345/Travel-builder/client/pages/LandingPage.css:undefined:NaN
-7:37:15 pm [vite] (client) Pre-transform error: [postcss] It looks like you're trying to use `tailwindcss` directly as a PostCSS plugin. The PostCSS plugin has moved to a separate package, so to continue using Tailwind CSS with PostCSS you'll need to install `@tailwindcss/postcss` and update your PostCSS configuration.
-  Plugin: vite:css
-  File: C:/Harsha space/Where should i  store/clone of the web app/New folder2345/Travel-builder/client/components/login-form.css:undefined:NaN
-7:37:15 pm [vite] (client) Pre-transform error: [postcss] It looks like you're trying to use `tailwindcss` directly as a PostCSS plugin. The PostCSS plugin has moved to a separate package, so to continue using Tailwind CSS with PostCSS you'll need to install `@tailwindcss/postcss` and update your PostCSS configuration.
-  Plugin: vite:css
-  File: C:/Harsha space/Where should i  store/clone of the web app/New folder2345/Travel-builder/client/components/saved-plans-header.module.css:undefined:NaN
-7:37:15 pm [vite] Internal server error: [postcss] It looks like you're trying to use `tailwindcss` directly as a PostCSS plugin. The PostCSS plugin has moved to a separate package, so to continue using Tailwind CSS with PostCSS you'll need to install `@tailwindcss/postcss` and update your PostCSS configuration.
-  Plugin: vite:css
-  File: C:/Harsha space/Where should i  store/clone of the web app/New folder2345/Travel-builder/client/global.css:undefined:NaN
-      at We (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\tailwindcss@4.1.13\node_modules\tailwindcss\dist\lib.js:35:2121)
-      at LazyResult.runOnRoot (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:361:16)
-      at LazyResult.runAsync (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:290:26)
-      at async runPostCSS (file:///C:/Harsha%20space/Where%20should%20i%20%20store/clone%20of%20the%20web%20app/New%20folder2345/Travel-builder/node_modules/.pnpm/vite@7.1.3_@types+node@20.1_30c207a77b77e6add72c0aa2c451fc99/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:32378:19)
-      at async compilePostCSS (file:///C:/Harsha%20space/Where%20should%20i%20%20store/clone%20of%20the%20web%20app/New%20folder2345/Travel-builder/node_modules/.pnpm/vite@7.1.3_@types+node@20.1_30c207a77b77e6add72c0aa2c451fc99/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:32358:17)
-      at async compileCSS (file:///C:/Harsha%20space/Where%20should%20i%20%20store/clone%20of%20the%20web%20app/New%20folder2345/Travel-builder/node_modules/.pnpm/vite@7.1.3_@types+node@20.1_30c207a77b77e6add72c0aa2c451fc99/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:32289:26)
-      at async TransformPluginContext.handler (file:///C:/Harsha%20space/Where%20should%20i%20%20store/clone%20of%20the%20web%20app/New%20folder2345/Travel-builder/node_modules/.pnpm/vite@7.1.3_@types+node@20.1_30c207a77b77e6add72c0aa2c451fc99/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:31819:54)  
-      at async EnvironmentPluginContainer.transform (file:///C:/Harsha%20space/Where%20should%20i%20%20store/clone%20of%20the%20web%20app/New%20folder2345/Travel-builder/node_modules/.pnpm/vite@7.1.3_@types+node@20.1_30c207a77b77e6add72c0aa2c451fc99/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:31220:14)
-      at async loadAndTransform (file:///C:/Harsha%20space/Where%20should%20i%20%20store/clone%20of%20the%20web%20app/New%20folder2345/Travel-builder/node_modules/.pnpm/vite@7.1.3_@types+node@20.1_30c207a77b77e6add72c0aa2c451fc99/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:26307:26)
-7:37:15 pm [vite] (client) Pre-transform error: [postcss] It looks like you're trying to use `tailwindcss` directly as a PostCSS plugin. The PostCSS plugin has moved to a separate package, so to continue using Tailwind CSS with PostCSS you'll need to install `@tailwindcss/postcss` and update your PostCSS configuration.
-  Plugin: vite:css
-  File: C:/Harsha space/Where should i  store/clone of the web app/New folder2345/Travel-builder/client/global.css:undefined:NaN
-7:37:15 pm [vite] Internal server error: [postcss] It looks like you're trying to use `tailwindcss` directly as a PostCSS plugin. The PostCSS plugin has moved to a separate package, so to continue using Tailwind CSS with PostCSS you'll need to install `@tailwindcss/postcss` and update your PostCSS configuration.
-  Plugin: vite:css
-  File: C:/Harsha space/Where should i  store/clone of the web app/New folder2345/Travel-builder/client/pages/LandingPage.css:undefined:NaN
-      at We (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\tailwindcss@4.1.13\node_modules\tailwindcss\dist\lib.js:35:2121)
-      at LazyResult.runOnRoot (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:361:16)
-      at LazyResult.runAsync (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:290:26)
-      at LazyResult.async (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:192:30)
-      at LazyResult.then (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:436:17)
-7:37:15 pm [vite] Internal server error: [postcss] It looks like you're trying to use `tailwindcss` directly as a PostCSS plugin. The PostCSS plugin has moved to a separate package, so to continue using Tailwind CSS with PostCSS you'll need to install `@tailwindcss/postcss` and update your PostCSS configuration.
-  Plugin: vite:css
-  File: C:/Harsha space/Where should i  store/clone of the web app/New folder2345/Travel-builder/client/components/login-form.css:undefined:NaN
-      at We (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\tailwindcss@4.1.13\node_modules\tailwindcss\dist\lib.js:35:2121)
-      at LazyResult.runOnRoot (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:361:16)
-      at LazyResult.runAsync (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:290:26)
-      at LazyResult.async (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:192:30)
-      at LazyResult.then (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:436:17)
-7:37:15 pm [vite] Internal server error: [postcss] It looks like you're trying to use `tailwindcss` directly as a PostCSS plugin. The PostCSS plugin has moved to a separate package, so to continue using Tailwind CSS with PostCSS you'll need to install `@tailwindcss/postcss` and update your PostCSS configuration.
-  Plugin: vite:css
-  File: C:/Harsha space/Where should i  store/clone of the web app/New folder2345/Travel-builder/client/components/saved-plans-header.module.css:undefined:NaN
-      at We (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\tailwindcss@4.1.13\node_modules\tailwindcss\dist\lib.js:35:2121)
-      at LazyResult.runOnRoot (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:361:16)
-      at LazyResult.runAsync (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:290:26)
-      at LazyResult.async (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:192:30)
-      at LazyResult.then (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\postcss@8.5.6\node_modules\postcss\lib\lazy-result.js:436:17)
- errors shown on the screen :
- [plugin:vite:css] [postcss] It looks like you're trying to use `tailwindcss` directly as a PostCSS plugin. The PostCSS plugin has moved to a separate package, so to continue using Tailwind CSS with PostCSS you'll need to install `@tailwindcss/postcss` and update your PostCSS configuration.
-C:/Harsha space/Where should i  store/clone of the web app/New folder2345/Travel-builder/client/components/saved-plans-header.module.css:undefined:nul
+18:42:42.077 Running build in Washington, D.C., USA (East) – iad1
+18:42:42.088 Build machine configuration: 2 cores, 8 GB
+18:42:42.125 Cloning github.com/HarshaTheCode/Trvael-genie (Branch: main, Commit: 2e2545a)
+18:42:42.435 Previous build caches not available
+18:42:42.771 Cloning completed: 646.000ms
+18:42:43.595 Running "vercel build"
+18:42:44.114 Vercel CLI 48.1.1
+18:42:45.779 Detected `pnpm-lock.yaml` version 9 generated by pnpm@10.x with package.json#packageManager pnpm@10.14.0+sha512.ad27a79641b49c3e481a16a805baa71817a04bbe06a38d17e60e2eaee83f6a146c6a688125f5792e48dd5ba30e7da52a5cda4c3992b9ccf333f9ce223af84748
+18:42:45.800 Installing dependencies...
+18:42:48.072  ERR_PNPM_OUTDATED_LOCKFILE  Cannot install with "frozen-lockfile" because pnpm-lock.yaml is not up to date with <ROOT>/package.json
+18:42:48.073 
+18:42:48.073 Note that in CI environments this setting is true by default. If you still need to run install in such cases, use "pnpm install --no-frozen-lockfile"
+18:42:48.073 
+18:42:48.073   Failure reason:
+18:42:48.073   specifiers in the lockfile don't match specifiers in package.json:
+18:42:48.073 * 1 dependencies were added: @tailwindcss/vite@^4.1.13
+18:42:48.073 
+18:42:48.093 Error: Command "pnpm install" exited with 1
