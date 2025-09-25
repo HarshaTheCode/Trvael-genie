@@ -3,9 +3,7 @@
 
 /* Removed unsupported @custom-variant - not standard Tailwind/PostCSS */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
 
 :root {
   font-synthesis: none;
@@ -285,6 +283,8 @@ h1, h2, h3, h4, h5, h6 {
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+
 }
 
 @layer base {
