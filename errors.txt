@@ -1,13 +1,17 @@
 
-transforming (1091) node_modules\.pnpm\react-dom@18.3.1_react@18.3.1\node_modules\react-dom\client.jsError: The --spacing(…) function requires that the `--spacing` theme variable exists, but it was not found.
-    at Object.yn [as --spacing] (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\tailwindcss@4.1.13\node_modules\tailwindcss\dist\lib.js:13:3878)
-    at C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\tailwindcss@4.1.13\node_modules\tailwindcss\dist\lib.js:13:5528
-    at ee (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\tailwindcss@4.1.13\node_modules\tailwindcss\dist\lib.js:1:7997)
-    at Tr (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\tailwindcss@4.1.13\node_modules\tailwindcss\dist\lib.js:13:5401)
-    at C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\tailwindcss@4.1.13\node_modules\tailwindcss\dist\lib.js:13:5173
-    at L (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\tailwindcss@4.1.13\node_modules\tailwindcss\dist\lib.js:3:1656)
-    at L (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\tailwindcss@4.1.13\node_modules\tailwindcss\dist\lib.js:3:1939)
-    at L (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\tailwindcss@4.1.13\node_modules\tailwindcss\dist\lib.js:3:1574)
-    at Se (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\tailwindcss@4.1.13\node_modules\tailwindcss\dist\lib.js:13:5098)
-    at bi (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\.pnpm\tailwindcss@4.1.13\node_modules\tailwindcss\dist\lib.js:35:769)
-✓ 1753 modules transformed.
+transforming (1069) node_modules\lucide-react\dist\esm\icons\list-restart.jsUnable to resolve `@import "tw-animate-css"` from C:/Harsha space/Where should i  store/clone of the web app/New folder2345/Travel-builder/client
+✓ 1733 modules transformed.
+✗ Build failed in 1.14s
+error during build:
+[vite:css] [postcss] ENOENT: no such file or directory, open 'C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\tw-animate-css'
+file: C:/Harsha space/Where should i  store/clone of the web app/New folder2345/Travel-builder/client/global.css:undefined:NaN
+    at async open (node:internal/fs/promises:638:25)
+    at async Object.readFile (node:internal/fs/promises:1242:14)
+    at async Object.load (file:///C:/Harsha%20space/Where%20should%20i%20%20store/clone%20of%20the%20web%20app/New%20folder2345/Travel-builder/node_modules/vite/dist/node/chunks/dep-D5b0Zz6C.js:32078:19)
+    at async loadImportContent (file:///C:/Harsha%20space/Where%20should%20i%20%20store/clone%20of%20the%20web%20app/New%20folder2345/Travel-builder/node_modules/vite/dist/node/chunks/dep-CwrJo3zV.js:401:19)
+    at async Promise.all (index 0)
+    at async resolveImportId (file:///C:/Harsha%20space/Where%20should%20i%20%20store/clone%20of%20the%20web%20app/New%20folder2345/Travel-builder/node_modules/vite/dist/node/chunks/dep-CwrJo3zV.js:387:20)
+    at async parseStyles$1 (file:///C:/Harsha%20space/Where%20should%20i%20%20store/clone%20of%20the%20web%20app/New%20folder2345/Travel-builder/node_modules/vite/dist/node/chunks/dep-CwrJo3zV.js:340:4)
+    at async Object.Once (file:///C:/Harsha%20space/Where%20should%20i%20%20store/clone%20of%20the%20web%20app/New%20folder2345/Travel-builder/node_modules/vite/dist/node/chunks/dep-CwrJo3zV.js:465:20)
+    at async LazyResult.runAsync (C:\Harsha space\Where should i  store\clone of the web app\New folder2345\Travel-builder\node_modules\postcss\lib\lazy-result.js:293:11)
+    at async runPostCSS (file:///C:/Harsha%20space/Where%20should%20i%20%20store/clone%20of%20the%20web%20app/New%20folder2345/Travel-builder/node_modules/vite/dist/node/chunks/dep-D5b0Zz6C.js:32132:19)
