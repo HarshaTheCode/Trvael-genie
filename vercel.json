@@ -1,13 +1,25 @@
 {
-  "functions": {
-    "dist/server/production.mjs": {
-      "runtime": "now-node@1.0.0"
+  "builds": [
+    {
+      "src": "server/node-build.ts",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["dist/server/**"],
+        "runtime": "nodejs20.x"
+      }
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist/spa"
+      }
     }
-  },
+  ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "dist/server/production.mjs"
+      "dest": "server/node-build.ts"
     },
     {
       "src": "/(.*)",
