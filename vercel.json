@@ -1,0 +1,17 @@
+{
+  "functions": {
+    "dist/server/production.mjs": {
+      "runtime": "now-node@1.0.0"
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "dist/server/production.mjs"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/dist/spa/$1"
+    }
+  ]
+}
